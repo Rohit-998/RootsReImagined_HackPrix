@@ -4,14 +4,12 @@ import { useState, useEffect, useRef } from 'react';
 import { ShieldAlert, ShieldCheck, ShieldX, QrCode, CheckCircle2, XCircle, Volume2, Play } from 'lucide-react';
 import styles from './page.module.css';
 
-// Static barcode widths — no Math.random() to avoid SSR/hydration mismatch
 const BARCODE_WIDTHS = [3,6,3,3,6,3,6,6,3,6,3,3,6,3,6,3,3,6,6,3];
 
-// The cloned QR payload that will FAIL verification (50+ scans in DB)
 const FAKE_QR_PAYLOAD = {
   batch_id: 'BATCH-CIP-2024-015',
   serial_number: 'SN-0002',
-  hash: '' // intentionally wrong — Layer 2 will fail too
+  hash: ''
 };
 
 export default function DemoPage() {
@@ -35,7 +33,6 @@ export default function DemoPage() {
     setAudioReady(false);
 
     try {
-      // Hit real verify API with the fake/cloned medicine
       const res = await fetch('/api/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -65,10 +62,9 @@ export default function DemoPage() {
       setVerdict(data.verdict);
       setScore(data.totalScore);
 
-      // Fetch Sarvam TTS for the verdict
       const verdictText = data.verdict === 'counterfeit'
-        ? 'चेतावनी! यह दवा नकली है। इसे इस्तेमाल न करें।'
-        : 'यह दवा संदिग्ध है। कृपया इसे न लें।';
+        ? 'chetaavani! yah davaa nakalee hai. ise istemaal na karen.'
+        : 'yah davaa sandigdh hai. kripya ise na len.';
 
       fetch('/api/voice/synthesize', {
         method: 'POST',
@@ -84,13 +80,11 @@ export default function DemoPage() {
           setAudioReady(true);
         });
 
-    } catch (err) {
-      console.error('Demo API error:', err);
+    } catch {
       setRunning(false);
     }
   }
 
-  // Animate steps one by one after data arrives
   useEffect(() => {
     if (demoSteps.length === 0) return;
     let i = 0;
@@ -101,10 +95,9 @@ export default function DemoPage() {
         clearInterval(interval);
         setDone(true);
         setRunning(false);
-        // Auto-play audio after steps finish
         setTimeout(() => {
           if (audioRef.current) {
-            audioRef.current.play().catch(console.error);
+            audioRef.current.play().catch(() => {});
             setAudioPlaying(true);
           }
         }, 600);
@@ -120,7 +113,7 @@ export default function DemoPage() {
       setAudioPlaying(false);
     } else {
       audioRef.current.currentTime = 0;
-      audioRef.current.play().catch(console.error);
+      audioRef.current.play().catch(() => {});
       setAudioPlaying(true);
     }
   };
@@ -130,15 +123,14 @@ export default function DemoPage() {
       <div className={styles.pageHeader}>
         <h1 className={styles.title}>Live Verification Demo</h1>
         <p className={styles.subtitle}>
-          See how MediGuard catches counterfeit medicines in seconds — compared to traditional barcode systems.
+          See how MediGuard catches counterfeit medicines compared to traditional barcode systems.
         </p>
       </div>
 
       <div className={styles.splitLayout}>
-        {/* LEFT: Current System */}
         <div className={`${styles.panel} ${styles.legacyPanel}`}>
           <div className={styles.panelHeader}>
-            <QrCode size={20} />
+            <QrCode size={18} />
             <span>Current System</span>
           </div>
           <div className={styles.legacyBody}>
@@ -148,12 +140,12 @@ export default function DemoPage() {
                   <div key={i} className={styles.barcodeLine} style={{ width: `${w}px` }} />
                 ))}
               </div>
-              <p className={styles.barcodeLabel}>|||| BATCH-CIP-2024-015 ||||</p>
+              <p className={styles.barcodeLabel}>BATCH-CIP-2024-015</p>
             </div>
 
             <div className={styles.legacyResult}>
               <CheckCircle2 size={18} className={styles.legacyCheck} />
-              <span>Product Found ✅</span>
+              <span>Product Found</span>
             </div>
 
             <div className={styles.legacyInfo}>
@@ -163,38 +155,36 @@ export default function DemoPage() {
 
             <div className={styles.legacyWarning}>
               <ShieldAlert size={16} />
-              <span>No additional validation — <strong>CLONED QR undetected</strong></span>
+              <span>No additional validation - cloned QR undetected</span>
             </div>
           </div>
         </div>
 
-        {/* RIGHT: MediGuard */}
         <div className={`${styles.panel} ${styles.mediguardPanel}`}>
           <div className={styles.panelHeader}>
-            <ShieldCheck size={20} />
-            <span>MediGuard — 6 Layer Engine</span>
+            <ShieldCheck size={18} />
+            <span>MediGuard - 6 Layer Engine</span>
           </div>
           <div className={styles.mediguardBody}>
             <div className={styles.stepsList}>
               {demoSteps.length === 0 && (
                 <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem 0' }}>
-                  Press "Run Verification" to start the demo
+                  Press Run Verification to start the demo
                 </p>
               )}
               {demoSteps.map((step, idx) => {
                 const revealed  = idx <= currentStep;
                 const isSuccess = step.status === 'success';
                 return (
-                  <div
-                    key={step.label}
+                  <div key={step.label}
                     className={`${styles.demoStep} ${revealed ? styles.stepRevealed : ''} ${revealed && isSuccess ? styles.stepSuccess : ''} ${revealed && !isSuccess ? styles.stepFail : ''}`}
                   >
                     {!revealed ? (
                       <div className={styles.stepPending} />
                     ) : isSuccess ? (
-                      <CheckCircle2 size={20} className={styles.iconSuccess} />
+                      <CheckCircle2 size={18} className={styles.iconSuccess} />
                     ) : (
-                      <XCircle size={20} className={styles.iconFail} />
+                      <XCircle size={18} className={styles.iconFail} />
                     )}
                     <span className={styles.stepLabel}>{step.label}</span>
                     {revealed && (
@@ -209,42 +199,37 @@ export default function DemoPage() {
 
             {done && verdict && (
               <div className={styles.verdictBox} style={{
-                background: verdict === 'counterfeit' ? 'rgba(220,38,38,0.1)' : 'rgba(217,119,6,0.1)',
-                border: `2px solid ${verdict === 'counterfeit' ? '#DC2626' : '#D97706'}`,
-                color: verdict === 'counterfeit' ? '#DC2626' : '#D97706',
+                background: verdict === 'counterfeit' ? 'rgba(220,38,38,0.08)' : 'rgba(210,248,3,0.15)',
+                border: `1px solid ${verdict === 'counterfeit' ? '#DC2626' : '#D2F803'}`,
+                color: verdict === 'counterfeit' ? '#DC2626' : '#3B3F00',
               }}>
-                {verdict === 'counterfeit' ? <ShieldX size={36} /> : <ShieldAlert size={36} />}
+                {verdict === 'counterfeit' ? <ShieldX size={32} /> : <ShieldAlert size={32} />}
                 <div>
                   <p className={styles.verdictLabel}>
-                    {verdict === 'counterfeit' ? '🚨 COUNTERFEIT DETECTED' : '⚠️ SUSPICIOUS MEDICINE'}
+                    {verdict === 'counterfeit' ? 'Counterfeit Detected' : 'Suspicious Medicine'}
                   </p>
-                  <p className={styles.verdictSub}>Trust Score: {score}/100 — Clone detection failed. QR scanned 50+ times.</p>
+                  <p className={styles.verdictSub}>Trust Score: {score}/100 - Clone detection failed. QR scanned 50+ times.</p>
                 </div>
               </div>
             )}
 
-            <div style={{ display: 'flex', gap: '12px', marginTop: '1rem' }}>
-              <button
-                className={styles.runBtn}
-                onClick={runDemo}
-                disabled={running}
-              >
-                {running ? 'Verifying...' : done ? '🔄 Run Again' : <><Play size={16} /> Run Verification</>}
+            <div style={{ display: 'flex', gap: '12px', marginTop: '0.5rem' }}>
+              <button className={styles.runBtn} onClick={runDemo} disabled={running}>
+                {running ? 'Verifying...' : done ? <><Play size={16} /> Run Again</> : <><Play size={16} /> Run Verification</>}
               </button>
 
               {audioReady && done && (
                 <button
                   onClick={playAudio}
+                  className={styles.audioBtn}
                   style={{
-                    display: 'flex', alignItems: 'center', gap: '6px',
-                    padding: '10px 18px', borderRadius: '8px',
-                    background: audioPlaying ? '#DC2626' : 'rgba(220,38,38,0.1)',
-                    color: '#DC2626', border: '1px solid #DC2626',
-                    cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem',
+                    background: audioPlaying ? 'var(--color-danger)' : 'transparent',
+                    color: audioPlaying ? 'white' : 'var(--color-danger)',
+                    borderColor: 'var(--color-danger)',
                   }}
                 >
                   <Volume2 size={16} />
-                  {audioPlaying ? 'Playing...' : '🔊 Hear Warning'}
+                  {audioPlaying ? 'Playing...' : 'Hear Warning'}
                 </button>
               )}
             </div>

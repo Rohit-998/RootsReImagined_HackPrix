@@ -38,7 +38,6 @@ export default function ScanPage() {
   const [cameraActive, setCameraActive] = useState(false);
   const [cameraError, setCameraError] = useState('');
 
-  // ── Start camera ──
   const startCamera = useCallback(async () => {
     setCameraError('');
     try {
@@ -48,7 +47,6 @@ export default function ScanPage() {
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        // Catch AbortError specifically if the stream is stopped before play completes
         await videoRef.current.play().catch(e => {
           if (e.name !== 'AbortError') throw e;
         });
@@ -56,17 +54,15 @@ export default function ScanPage() {
       setCameraActive(true);
       startScanLoop();
     } catch (err) {
-      console.error('Camera error:', err);
       if (err.name === 'NotAllowedError' || err.name === 'NotFoundError') {
-        setCameraError('Camera access denied or no camera found. Please use the "Upload QR" option below.');
+        setCameraError('Camera access denied or no camera found. Use image upload instead.');
       } else {
-        setCameraError('Could not start the camera. Please use image upload instead.');
+        setCameraError('Could not start the camera. Use image upload instead.');
       }
       setCameraActive(false);
     }
   }, []);
 
-  // ── Stop camera ──
   const stopCamera = useCallback(() => {
     if (scanLoopRef.current) {
       cancelAnimationFrame(scanLoopRef.current);
@@ -82,7 +78,6 @@ export default function ScanPage() {
     setCameraActive(false);
   }, []);
 
-  // ── Scan loop — reads frames and checks for QR codes ──
   const startScanLoop = useCallback(() => {
     const scan = () => {
       if (!videoRef.current || !canvasRef.current || videoRef.current.readyState !== 4) {
@@ -99,7 +94,6 @@ export default function ScanPage() {
       const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
 
       if (code) {
-        // Found a QR — stop camera and process
         stopCamera();
         processQRData(code.data);
         return;
@@ -109,7 +103,6 @@ export default function ScanPage() {
     scanLoopRef.current = requestAnimationFrame(scan);
   }, [stopCamera]);
 
-  // ── Process decoded QR string ──
   const processQRData = useCallback((rawData) => {
     try {
       const qrData = JSON.parse(rawData);
@@ -119,8 +112,6 @@ export default function ScanPage() {
       }
       runVerification(qrData);
     } catch {
-      // Hackathon Demo Magic: non-JSON QR (real medicine)
-      console.log("Non-JSON QR detected. Engaging live demo override for:", rawData);
       runVerification({
         batch_id: '70454',
         serial_number: 'SN-0001',
@@ -129,7 +120,6 @@ export default function ScanPage() {
     }
   }, []);
 
-  // Clean up camera on unmount or tab switch
   useEffect(() => {
     return () => stopCamera();
   }, [stopCamera]);
@@ -142,7 +132,6 @@ export default function ScanPage() {
     }
   }, [activeTab]);
 
-  // ── Animate steps one by one ────────────────────────────────────────────
   const animateSteps = (results) => {
     const keys = ['batchCheck', 'hashCheck', 'scanFrequency', 'geoCheck', 'temporalCheck', 'supplyChain'];
     keys.forEach((key, i) => {
@@ -156,21 +145,18 @@ export default function ScanPage() {
     });
   };
 
-  // ── Core verify function ────────────────────────────────────────────────
   const runVerification = async (qrData) => {
     setIsVerifying(true);
     setError('');
-    // Reset steps
     setVerificationSteps(STEP_IDS.map(id => ({ id, label: STEP_LABELS[id], status: 'pending' })));
 
-    // Get user location for geo check
     let userLocation = {};
     try {
       const pos = await new Promise((res, rej) =>
         navigator.geolocation.getCurrentPosition(res, rej, { timeout: 3000 })
       );
       userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude, region: 'Maharashtra' };
-    } catch { /* location denied – proceed without it */ }
+    } catch {}
 
     try {
       const res = await fetch('/api/verify', {
@@ -182,29 +168,25 @@ export default function ScanPage() {
 
       if (data.error) throw new Error(data.error);
 
-      // Animate steps
       animateSteps(data.results);
 
-      // Save to localStorage scan history
       try {
         const history = JSON.parse(localStorage.getItem('mg_scan_history') || '[]');
         history.unshift({
-          name:    data.medicineInfo?.name || qrData.batch_id,
-          batch:   qrData.batch_id,
+          name: data.medicineInfo?.name || qrData.batch_id,
+          batch: qrData.batch_id,
           verdict: data.verdict,
-          score:   data.totalScore,
-          time:    new Date().toISOString(),
+          score: data.totalScore,
+          time: new Date().toISOString(),
         });
         localStorage.setItem('mg_scan_history', JSON.stringify(history.slice(0, 20)));
       } catch {}
 
-      // Add to recent scans
       setRecentScans(prev => [
         { label: data.medicineInfo?.name || qrData.batch_id, verdict: data.verdict, score: data.totalScore, time: new Date().toLocaleTimeString() },
         ...prev.slice(0, 4)
       ]);
 
-      // Wait for animation to finish then redirect
       setTimeout(() => {
         const params = new URLSearchParams({ data: JSON.stringify(data) });
         router.push(`/results?${params.toString()}`);
@@ -216,7 +198,6 @@ export default function ScanPage() {
     }
   };
 
-  // ── Upload image + decode QR ────────────────────────────────────────────
   const handleImageUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -245,11 +226,7 @@ export default function ScanPage() {
           return;
         }
         runVerification(qrData);
-      } catch (err) {
-        // 🚀 HACKATHON DEMO MAGIC:
-        // If a real-world, physical medicine QR is scanned (like Cyclopam), it won't be JSON.
-        // Instead of failing, we gracefully override it to our seeded Cyclopam batch in DB.
-        console.log("Non-JSON QR detected. Engaging live demo override for:", code.data);
+      } catch {
         runVerification({
           batch_id: '70454',
           serial_number: 'SN-0001',
@@ -260,23 +237,19 @@ export default function ScanPage() {
     img.onerror = () => setError('Could not load the image.');
     img.src = url;
 
-    // Reset input so same file can be re-selected
     e.target.value = '';
   };
 
-  // ── Manual verify ───────────────────────────────────────────────────────
   const handleManualVerify = () => {
     if (!manualBatch.trim() || !manualSerial.trim()) {
       setError('Please enter both Batch ID and Serial Number.');
       return;
     }
-    // Generate a dummy hash that the backend will catch as wrong (for demo of fake)
-    // Real hash would need the secret — for manual entry we pass empty hash
     runVerification({ batch_id: manualBatch.trim(), serial_number: manualSerial.trim(), hash: '' });
   };
 
   const verdictColor = (verdict) =>
-    verdict === 'verified' ? '#10b981' : verdict === 'suspicious' ? '#f59e0b' : '#ef4444';
+    verdict === 'verified' ? 'var(--color-verified)' : verdict === 'suspicious' ? 'var(--color-suspicious)' : 'var(--color-danger)';
 
   return (
     <div className={`container ${styles.scanContainer}`}>
@@ -286,7 +259,6 @@ export default function ScanPage() {
       </div>
 
       <div className={styles.layout}>
-        {/* Left Column */}
         <div className={styles.leftCol}>
           <Card className={styles.inputCard}>
             <div className={styles.tabs}>
@@ -294,41 +266,34 @@ export default function ScanPage() {
                 className={`${styles.tab} ${activeTab === 'scan' ? styles.activeTab : ''}`}
                 onClick={() => setActiveTab('scan')}
               >
-                <QrCode size={18} /> QR Scanner
+                <QrCode size={16} /> QR Scanner
               </button>
               <button
                 className={`${styles.tab} ${activeTab === 'manual' ? styles.activeTab : ''}`}
                 onClick={() => setActiveTab('manual')}
               >
-                <Keyboard size={18} /> Manual Entry
+                <Keyboard size={16} /> Manual Entry
               </button>
             </div>
 
             <div className={styles.inputContent}>
               {activeTab === 'scan' ? (
                 <div className={styles.scannerContainer}>
-                  <div className={styles.scannerFrame} style={{ position: 'relative', overflow: 'hidden' }}>
-                    {/* Live camera feed */}
+                  <div className={styles.scannerFrame}>
                     <video
                       ref={videoRef}
                       playsInline
                       muted
-                      style={{
-                        position: 'absolute', inset: 0, width: '100%', height: '100%',
-                        objectFit: 'cover', borderRadius: '12px',
-                        display: cameraActive ? 'block' : 'none',
-                      }}
+                      className={styles.videoFeed}
                     />
-                    {/* Hidden canvas for QR frame analysis */}
                     <canvas ref={canvasRef} style={{ display: 'none' }} />
 
-                    {/* Scanner overlay corners */}
-                    <div className={styles.scannerCorner + ' ' + styles.tl}></div>
-                    <div className={styles.scannerCorner + ' ' + styles.tr}></div>
-                    <div className={styles.scannerCorner + ' ' + styles.bl}></div>
-                    <div className={styles.scannerCorner + ' ' + styles.br}></div>
+                    {cameraActive && <div className={styles.scannerLine} />}
 
-                    {cameraActive && <div className={styles.scannerLine}></div>}
+                    <div className={`${styles.scannerCorner} ${styles.tl}`} />
+                    <div className={`${styles.scannerCorner} ${styles.tr}`} />
+                    <div className={`${styles.scannerCorner} ${styles.bl}`} />
+                    <div className={`${styles.scannerCorner} ${styles.br}`} />
 
                     {!cameraActive && (
                       <p className={styles.scannerText}>
@@ -337,7 +302,6 @@ export default function ScanPage() {
                     )}
                   </div>
 
-                  {/* Hidden file input */}
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -347,79 +311,37 @@ export default function ScanPage() {
                     style={{ display: 'none' }}
                   />
 
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                  <div className={styles.scannerActions}>
                     {!cameraActive ? (
-                      <Button
-                        variant="primary"
-                        className={styles.fullWidthBtn}
-                        onClick={startCamera}
-                        disabled={isVerifying}
-                        style={{ flex: 1 }}
-                      >
+                      <Button variant="primary" className={styles.fullWidthBtn} onClick={startCamera} disabled={isVerifying}>
                         <Camera size={16} /> Open Camera
                       </Button>
                     ) : (
-                      <Button
-                        variant="outline"
-                        className={styles.fullWidthBtn}
-                        onClick={stopCamera}
-                        style={{ flex: 1 }}
-                      >
+                      <Button variant="secondary" className={styles.fullWidthBtn} onClick={stopCamera}>
                         <CameraOff size={16} /> Stop Camera
                       </Button>
                     )}
-                    <Button
-                      variant="outline"
-                      className={styles.fullWidthBtn}
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={isVerifying}
-                      style={{ flex: 1 }}
-                    >
-                      {isVerifying ? (
-                        <><Loader2 size={16} className="animate-spin" /> Verifying...</>
-                      ) : (
-                        <><Upload size={16} /> Upload QR</>
-                      )}
+                    <Button variant="secondary" className={styles.fullWidthBtn} onClick={() => fileInputRef.current?.click()} disabled={isVerifying}>
+                      {isVerifying ? <><Loader2 size={16} className="animate-spin" /> Verifying...</> : <><Upload size={16} /> Upload QR</>}
                     </Button>
                   </div>
 
                   {(error || cameraError) && (
-                    <p style={{ color: '#ef4444', fontSize: '0.85rem', marginTop: '8px', textAlign: 'center' }}>
-                      {error || cameraError}
-                    </p>
+                    <p className={styles.errorText}>{error || cameraError}</p>
                   )}
                 </div>
               ) : (
                 <div className={styles.manualEntry}>
                   <div className={styles.formGroup}>
                     <label>Batch ID</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. BATCH-SUN-2024-001"
-                      className={styles.input}
-                      value={manualBatch}
-                      onChange={e => setManualBatch(e.target.value)}
-                    />
+                    <input type="text" placeholder="e.g. BATCH-SUN-2024-001" className={styles.input} value={manualBatch} onChange={e => setManualBatch(e.target.value)} />
                   </div>
                   <div className={styles.formGroup}>
                     <label>Serial Number</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. SN-0001"
-                      className={styles.input}
-                      value={manualSerial}
-                      onChange={e => setManualSerial(e.target.value)}
-                    />
+                    <input type="text" placeholder="e.g. SN-0001" className={styles.input} value={manualSerial} onChange={e => setManualSerial(e.target.value)} />
                   </div>
-                  {error && (
-                    <p style={{ color: '#ef4444', fontSize: '0.85rem' }}>{error}</p>
-                  )}
-                  <Button
-                    variant="primary"
-                    className={styles.fullWidthBtn}
-                    onClick={handleManualVerify}
-                    disabled={isVerifying}
-                  >
+                  {error && <p className={styles.errorText}>{error}</p>}
+                  <Button variant="primary" className={styles.fullWidthBtn} onClick={handleManualVerify} disabled={isVerifying}>
                     {isVerifying ? <><Loader2 size={16} className="animate-spin" /> Verifying...</> : 'Verify Batch'}
                   </Button>
                 </div>
@@ -427,7 +349,6 @@ export default function ScanPage() {
             </div>
           </Card>
 
-          {/* Recent Scans */}
           <div className={styles.recentScans}>
             <h3 className={styles.sectionTitle}>
               <History size={16} /> Recent Scans
@@ -437,12 +358,12 @@ export default function ScanPage() {
                 <p className={styles.emptyState}>No recent scans.</p>
               ) : (
                 recentScans.map((scan, i) => (
-                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div key={i} className={styles.recentItem}>
                     <div>
-                      <p style={{ fontSize: '0.9rem', fontWeight: 500 }}>{scan.label}</p>
-                      <p style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{scan.time}</p>
+                      <p className={styles.recentName}>{scan.label}</p>
+                      <p className={styles.recentTime}>{scan.time}</p>
                     </div>
-                    <span style={{ color: verdictColor(scan.verdict), fontWeight: 700, fontSize: '0.85rem' }}>
+                    <span className={styles.recentScore} style={{ color: verdictColor(scan.verdict) }}>
                       {scan.score}/100
                     </span>
                   </div>
@@ -452,7 +373,6 @@ export default function ScanPage() {
           </div>
         </div>
 
-        {/* Right Column: Steps */}
         <div className={styles.rightCol}>
           <Card className={styles.progressCard}>
             <h3 className={styles.panelTitle}>Verification Progress</h3>
@@ -460,10 +380,10 @@ export default function ScanPage() {
               {verificationSteps.map((step) => (
                 <div key={step.id} className={styles.step}>
                   <div className={styles.stepIcon}>
-                    {step.status === 'pending' && <Circle size={20} className={styles.iconPending} />}
-                    {step.status === 'success' && <CheckCircle2 size={20} className={styles.iconSuccess} />}
-                    {step.status === 'warning' && <AlertTriangle size={20} className={styles.iconWarning} />}
-                    {step.status === 'error' && <XCircle size={20} className={styles.iconError} />}
+                    {step.status === 'pending' && <Circle size={18} className={styles.iconPending} />}
+                    {step.status === 'success' && <CheckCircle2 size={18} className={styles.iconSuccess} />}
+                    {step.status === 'warning' && <AlertTriangle size={18} className={styles.iconWarning} />}
+                    {step.status === 'error' && <XCircle size={18} className={styles.iconError} />}
                   </div>
                   <span className={`${styles.stepLabel} ${styles[`text-${step.status}`]}`}>
                     {step.label}
@@ -474,7 +394,7 @@ export default function ScanPage() {
 
             <div className={styles.progressFooter}>
               <p className={styles.waitingText}>
-                {isVerifying ? '🔍 Running verification layers...' : 'Waiting for input...'}
+                {isVerifying ? 'Running verification layers...' : 'Waiting for input...'}
               </p>
             </div>
           </Card>

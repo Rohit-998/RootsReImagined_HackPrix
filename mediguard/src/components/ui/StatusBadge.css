@@ -1,30 +1,29 @@
 .status-badge {
   display: inline-flex;
   align-items: center;
-  padding: 4px 10px;
-  border-radius: 9999px; /* Pill shape */
+  padding: 2px 10px;
+  border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .badge-verified {
-  background-color: rgba(2, 132, 199, 0.1); /* Sky 600 with opacity */
+  background-color: rgba(91, 70, 255, 0.1);
   color: var(--color-verified);
-  border: 1px solid rgba(2, 132, 199, 0.2);
+  border: 1px solid rgba(91, 70, 255, 0.2);
 }
 
 .badge-suspicious {
-  background-color: rgba(217, 119, 6, 0.1); /* Amber 600 with opacity */
-  color: var(--color-warning);
-  border: 1px solid rgba(217, 119, 6, 0.2);
+  background-color: rgba(210, 248, 3, 0.15);
+  color: #3B3F00;
+  border: 1px solid rgba(210, 248, 3, 0.3);
 }
 
 .badge-counterfeit {
-  background-color: rgba(220, 38, 38, 0.1); /* Red 600 with opacity */
+  background-color: rgba(239, 68, 68, 0.1);
   color: var(--color-danger);
-  border: 1px solid rgba(220, 38, 38, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .badge-neutral {

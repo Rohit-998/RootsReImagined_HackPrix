@@ -4,19 +4,19 @@
 }
 
 .title {
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 700;
   margin-bottom: var(--spacing-sm);
+  color: var(--text-primary);
 }
 
 .subtitle {
   color: var(--text-secondary);
-  font-size: 1.125rem;
-  max-width: 640px;
+  font-size: 0.95rem;
+  max-width: 600px;
   margin: 0 auto;
 }
 
-/* Split layout */
 .splitLayout {
   display: grid;
   grid-template-columns: 1fr;
@@ -36,6 +36,8 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-sm);
 }
 
 .panelHeader {
@@ -46,15 +48,15 @@
   font-weight: 600;
   font-size: 1rem;
   border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
 }
 
-/* Legacy panel */
 .legacyPanel {
-  background-color: #F8FAFC;
+  background-color: var(--bg-surface);
 }
 
 .legacyPanel .panelHeader {
-  background-color: #F1F5F9;
+  background-color: var(--bg-primary);
   color: var(--text-secondary);
 }
 
@@ -70,7 +72,7 @@
   flex-direction: column;
   align-items: center;
   padding: var(--spacing-lg);
-  background-color: white;
+  background-color: var(--bg-primary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
 }
@@ -78,14 +80,14 @@
 .barcodeLines {
   display: flex;
   gap: 2px;
-  height: 80px;
+  height: 60px;
   align-items: flex-end;
   margin-bottom: var(--spacing-sm);
 }
 
 .barcodeLine {
   height: 100%;
-  background-color: #1E293B;
+  background-color: var(--text-primary);
 }
 
 .barcodeLabel {
@@ -100,18 +102,18 @@
   align-items: center;
   gap: var(--spacing-sm);
   font-weight: 500;
-  color: #16A34A; /* Green — correct for legacy success */
+  color: var(--color-verified);
 }
 
 .legacyCheck {
-  color: #16A34A;
+  color: var(--color-verified);
 }
 
 .legacyInfo {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
-  background-color: white;
+  background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: var(--spacing-md);
@@ -128,7 +130,7 @@
 }
 
 .legacyRow span:last-child {
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-primary);
 }
 
@@ -145,15 +147,10 @@
   border-radius: var(--radius-sm);
 }
 
-/* MediGuard panel */
-.mediguardPanel {
-  background-color: var(--bg-surface);
-}
-
 .mediguardPanel .panelHeader {
-  background-color: rgba(37, 99, 235, 0.05);
+  background-color: rgba(30, 58, 95, 0.05);
   color: var(--accent-primary);
-  border-bottom-color: rgba(37, 99, 235, 0.15);
+  border-bottom-color: rgba(30, 58, 95, 0.1);
 }
 
 .mediguardBody {
@@ -163,7 +160,6 @@
   gap: var(--spacing-lg);
 }
 
-/* Steps */
 .stepsList {
   display: flex;
   flex-direction: column;
@@ -187,8 +183,8 @@
 }
 
 .stepSuccess.stepRevealed {
-  border-color: rgba(2, 132, 199, 0.3);
-  background-color: rgba(2, 132, 199, 0.04);
+  border-color: rgba(5, 150, 105, 0.3);
+  background-color: rgba(5, 150, 105, 0.04);
 }
 
 .stepFail.stepRevealed {
@@ -197,8 +193,8 @@
 }
 
 .stepPending {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   border: 2px solid var(--border-color);
   flex-shrink: 0;
@@ -208,20 +204,22 @@
 .iconFail { color: var(--color-danger); }
 
 .stepLabel {
-  font-weight: 500;
+  font-weight: 600;
   flex: 1;
+  font-size: 0.9rem;
+  color: var(--text-primary);
 }
 
 .stepResult {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-  padding: 2px 8px;
-  border-radius: 9999px;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
 }
 
 .resultPass {
-  background-color: rgba(2, 132, 199, 0.1);
+  background-color: rgba(5, 150, 105, 0.1);
   color: var(--color-verified);
 }
 
@@ -230,57 +228,65 @@
   color: var(--color-danger);
 }
 
-/* Verdict */
 .verdictBox {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
   padding: var(--spacing-lg);
-  background-color: rgba(220, 38, 38, 0.08);
-  border: 2px solid rgba(220, 38, 38, 0.3);
   border-radius: var(--radius-md);
-  color: var(--color-danger);
-  animation: fadeIn 0.4s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
 }
 
 .verdictLabel {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 700;
   margin: 0 0 4px;
+  color: inherit;
 }
 
 .verdictSub {
-  font-size: 0.875rem;
-  color: var(--color-danger);
+  font-size: 0.85rem;
   opacity: 0.8;
   margin: 0;
+  color: inherit;
 }
 
-/* Run button */
 .runBtn {
-  padding: 10px 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  padding: 10px 20px;
   background-color: var(--accent-primary);
   color: white;
-  border: none;
+  border: 1px solid var(--accent-primary);
   border-radius: var(--radius-sm);
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
   font-family: var(--font-sans);
   cursor: pointer;
-  transition: background-color 0.2s ease;
-  align-self: flex-start;
+  transition: all 0.15s ease;
 }
 
 .runBtn:hover:not(:disabled) {
-  background-color: var(--accent-secondary);
+  background-color: #4A35E8;
+  border-color: #4A35E8;
 }
 
 .runBtn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.audioBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  font-family: var(--font-sans);
+  transition: all 0.15s ease;
 }

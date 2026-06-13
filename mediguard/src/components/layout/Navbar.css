@@ -1,7 +1,6 @@
 .navbar {
   background-color: var(--bg-surface);
   border-bottom: 1px solid var(--border-color);
-  padding: var(--spacing-md) 0;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -11,38 +10,48 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  height: 60px;
 }
 
 .navbar-brand {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  color: var(--text-primary);
-  text-decoration: none;
-}
-
-.navbar-logo {
+  gap: 10px;
   color: var(--accent-primary);
+  text-decoration: none;
 }
 
 .navbar-title {
   font-weight: 700;
-  font-size: 1.25rem;
-  letter-spacing: -0.02em;
+  font-size: 1.15rem;
+  color: var(--accent-primary);
 }
 
 .navbar-links {
   display: flex;
-  gap: var(--spacing-lg);
+  gap: 4px;
   align-items: center;
 }
 
 .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
   color: var(--text-secondary);
   font-weight: 500;
-  transition: color 0.2s ease;
+  font-size: 0.875rem;
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
 }
 
 .nav-link:hover {
   color: var(--text-primary);
+  background-color: var(--bg-primary);
+}
+
+.nav-link-active {
+  color: var(--accent-primary);
+  background-color: rgba(91, 70, 255, 0.06);
+  font-weight: 600;
 }

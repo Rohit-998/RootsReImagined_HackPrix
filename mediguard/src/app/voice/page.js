@@ -8,10 +8,9 @@ export default function VoicePage() {
   const [selectedLang, setSelectedLang] = useState('hi-IN');
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState('');
-  const [status, setStatus] = useState('idle'); // idle, recording, processing, verified
+  const [status, setStatus] = useState('idle');
   const [audioResultUrl, setAudioResultUrl] = useState(null);
 
-  // 1. Auto-detect location & set language
   useEffect(() => {
     if (!navigator.geolocation) {
       setLocation({ loading: false, error: 'Geolocation not supported' });
@@ -21,29 +20,26 @@ export default function VoicePage() {
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         try {
-          // Reverse geocoding (using a free API for demo purposes - Nominatim)
           const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`);
           const data = await res.json();
           const state = data.address.state || '';
           const city = data.address.city || data.address.town || '';
-          
+
           setLocation({ city, state, loading: false });
-          
-          // Auto-select language based on state
+
           if (state) {
             setSelectedLang(getLanguageForState(state));
           }
-        } catch (err) {
+        } catch {
           setLocation({ loading: false, error: 'Failed to fetch location details' });
         }
       },
-      (err) => {
+      () => {
         setLocation({ loading: false, error: 'Location access denied' });
       }
     );
   }, []);
 
-  // 2. Mock Recording Function (Since browser MediaRecorder requires HTTPS/localhost setup)
   const handleRecord = () => {
     if (isRecording) {
       setIsRecording(false);
@@ -56,138 +52,116 @@ export default function VoicePage() {
   };
 
   const simulateSarvamProcess = () => {
-    // 1. Transcribe (simulated delay)
     setTimeout(() => {
       setTranscript("Paracetamol 500mg (BATCH-SUN-2024-001)");
-      
-      // 2. Verify + TTS (simulated delay)
+
       setTimeout(async () => {
         setStatus('verified');
-        
-        // Actually call our TTS API to generate the audio
+
         try {
           const res = await fetch('/api/voice/synthesize', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              text: 'यह दवा बिल्कुल सुरक्षित है। आप इसका सेवन कर सकते हैं।', // Hardcoded Hindi for demo if language is hi-IN
-              language: selectedLang 
+            body: JSON.stringify({
+              text: 'yah davaa bilkul surakshit hai. aap iska sevan kar sakte hain.',
+              language: selectedLang
             })
           });
           const data = await res.json();
           if (data.audioBase64) {
             const audioSrc = `data:audio/wav;base64,${data.audioBase64}`;
             setAudioResultUrl(audioSrc);
-            
-            // Auto play
+
             const audio = new Audio(audioSrc);
             audio.play();
           }
-        } catch (e) {
-          console.error("TTS failed", e);
+        } catch {
+          console.error("TTS failed");
         }
       }, 2000);
     }, 2000);
   };
 
   return (
-    <div className="max-w-3xl mx-auto flex flex-col items-center gap-8 py-8">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-4">Voice Verification</h1>
-        <p className="text-slate-400">Powered by Sarvam AI. Speak the medicine name to verify.</p>
+    <div className="container" style={{ maxWidth: '720px', paddingTop: '2rem', paddingBottom: '4rem' }}>
+      <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>Voice Verification</h1>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Powered by Sarvam AI. Speak the medicine name to verify.</p>
       </div>
 
-      {/* Location & Language Bar */}
-      <div className="w-full glass-panel p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-2 text-slate-300">
-          <MapPin className="h-5 w-5 text-blue-400" />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1rem', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+          <MapPin size={16} style={{ color: 'var(--accent-primary)' }} />
           {location.loading ? (
-            <span className="animate-pulse">Detecting location...</span>
+            <span style={{ opacity: 0.6 }}>Detecting location...</span>
           ) : location.error ? (
-            <span className="text-yellow-400">{location.error}</span>
+            <span style={{ color: 'var(--color-warning)' }}>{location.error}</span>
           ) : (
             <span>{location.city}, {location.state}</span>
           )}
         </div>
 
-        <div className="flex items-center gap-3">
-          <label className="text-sm text-slate-400">Language:</label>
-          <select 
-            className="bg-slate-800 border border-slate-700 text-white rounded-lg px-3 py-2 outline-none focus:border-blue-500"
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Language:</label>
+          <select
+            style={{ padding: '6px 10px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', background: 'var(--bg-surface)', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', cursor: 'pointer' }}
             value={selectedLang}
             onChange={(e) => setSelectedLang(e.target.value)}
           >
             {SUPPORTED_LANGUAGES.map(lang => (
-              <option key={lang.code} value={lang.code}>
-                {lang.name}
-              </option>
+              <option key={lang.code} value={lang.code}>{lang.name}</option>
             ))}
           </select>
         </div>
       </div>
 
-      {/* Main Interaction Area */}
-      <div className="w-full glass-panel p-10 flex flex-col items-center justify-center min-h-[400px] relative overflow-hidden">
-        
-        {/* Recording Animation */}
-        {isRecording && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-64 h-64 bg-blue-500/20 rounded-full animate-ping"></div>
-            <div className="absolute w-48 h-48 bg-blue-500/20 rounded-full animate-pulse"></div>
-          </div>
-        )}
-
-        <button 
+      <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '3rem 2rem', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+        <button
           onClick={handleRecord}
           disabled={status === 'processing'}
-          className={`relative z-10 w-32 h-32 rounded-full flex items-center justify-center transition-all ${
-            isRecording 
-              ? 'bg-red-500 hover:bg-red-600 shadow-[0_0_30px_rgba(239,68,68,0.5)]' 
-              : status === 'processing'
-                ? 'bg-slate-700'
-                : 'bg-blue-600 hover:bg-blue-500 hover:scale-105 shadow-[0_0_30px_rgba(37,99,235,0.3)]'
-          }`}
+          style={{
+            width: '96px', height: '96px', borderRadius: '50%', border: 'none',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem',
+            cursor: status === 'processing' ? 'not-allowed' : 'pointer',
+            background: isRecording ? 'var(--color-danger)' : status === 'processing' ? 'var(--bg-primary)' : 'var(--accent-primary)',
+            color: 'white', transition: 'all 0.2s ease',
+            boxShadow: isRecording ? '0 0 0 8px rgba(220,38,38,0.15)' : 'none',
+          }}
         >
           {status === 'processing' ? (
-            <Loader2 className="h-12 w-12 text-white animate-spin" />
+            <Loader2 size={36} className="animate-spin" />
           ) : isRecording ? (
-            <MicOff className="h-12 w-12 text-white" />
+            <MicOff size={36} />
           ) : (
-            <Mic className="h-12 w-12 text-white" />
+            <Mic size={36} />
           )}
         </button>
 
-        <div className="mt-8 text-center z-10">
-          <p className="text-xl font-medium text-white h-8">
-            {status === 'idle' && "Tap to start speaking"}
-            {status === 'recording' && "Listening... Tap to stop"}
-            {status === 'processing' && "Sarvam AI is analyzing..."}
-            {status === 'verified' && "Verification Complete"}
-          </p>
-        </div>
+        <p style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
+          {status === 'idle' && "Tap to start speaking"}
+          {status === 'recording' && "Listening... Tap to stop"}
+          {status === 'processing' && "Sarvam AI is analyzing..."}
+          {status === 'verified' && "Verification Complete"}
+        </p>
 
-        {/* Results */}
         {transcript && (
-          <div className="mt-8 w-full max-w-md bg-slate-900/80 p-4 rounded-xl border border-slate-800 z-10">
-            <p className="text-sm text-slate-400 mb-1">Transcribed Text:</p>
-            <p className="text-lg text-white font-mono mb-4">"{transcript}"</p>
-            
+          <div style={{ marginTop: '1.5rem', background: 'var(--bg-primary)', borderRadius: 'var(--radius-sm)', padding: '1rem', border: '1px solid var(--border-color)', maxWidth: '400px', margin: '1.5rem auto 0' }}>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '4px' }}>Transcribed Text:</p>
+            <p style={{ fontSize: '0.95rem', color: 'var(--text-primary)', fontFamily: 'monospace', marginBottom: '0.75rem' }}>{transcript}</p>
+
             {status === 'verified' && (
-              <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-emerald-400 font-bold">
-                  <CheckCircle className="h-5 w-5" />
+              <div style={{ borderTop: '1px solid var(--border-color)', paddingTop: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--color-verified)', fontWeight: 600 }}>
+                  <CheckCircle size={18} />
                   Medicine Verified
                 </div>
                 {audioResultUrl && (
-                  <button 
-                    onClick={() => {
-                      const audio = new Audio(audioResultUrl);
-                      audio.play();
-                    }}
-                    className="p-2 bg-blue-500/20 text-blue-400 rounded-full hover:bg-blue-500/30 transition-colors"
+                  <button
+                    onClick={() => { const audio = new Audio(audioResultUrl); audio.play(); }}
+                    style={{ width: '36px', height: '36px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-surface)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-primary)' }}
                     title="Play Audio"
                   >
-                    <Volume2 className="h-5 w-5" />
+                    <Volume2 size={16} />
                   </button>
                 )}
               </div>

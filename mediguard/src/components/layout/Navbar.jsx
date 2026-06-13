@@ -2,17 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShieldCheck, Mic, Activity, Clock, Flag, BarChart2, BarChart3 } from 'lucide-react';
+import { ShieldCheck, QrCode, Flag, BarChart2, Activity } from 'lucide-react';
 import './Navbar.css';
 
 const NAV_LINKS = [
-  { href: '/scan',        label: 'Scan QR',       icon: ShieldCheck },
-  { href: '/voice',       label: 'Voice',          icon: Mic         },
-  { href: '/demo',        label: 'Live Demo',      icon: Activity    },
-  { href: '/pharmacies',  label: 'Pharmacies',     icon: BarChart2   },
-  { href: '/history',     label: 'History',        icon: Clock       },
-  { href: '/report',      label: '🚩 Report',      icon: Flag, accent: '#ef4444' },
-  { href: '/admin',       label: '📊 Admin',       icon: BarChart3, accent: '#7c3aed' },
+  { href: '/scan',        label: 'Scan Medicine',  icon: QrCode       },
+  { href: '/report',      label: 'Report',          icon: Flag         },
+  { href: '/pharmacies',  label: 'Pharmacies',      icon: BarChart2    },
+  { href: '/demo',        label: 'How It Works',    icon: Activity     },
 ];
 
 export default function Navbar() {
@@ -22,23 +19,20 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="container navbar-container">
         <Link href="/" className="navbar-brand">
-          <ShieldCheck className="navbar-logo" size={24} />
+          <ShieldCheck size={22} />
           <span className="navbar-title">MediGuard</span>
         </Link>
 
         <div className="navbar-links">
-          {NAV_LINKS.map(({ href, label, icon: Icon, accent }) => {
+          {NAV_LINKS.map(({ href, label, icon: Icon }) => {
             const active = pathname === href;
             return (
               <Link
                 key={href}
                 href={href}
-                className="nav-link"
-                style={{
-                  color: active ? (accent || '#2563EB') : accent || undefined,
-                  fontWeight: active || accent ? 700 : undefined,
-                }}
+                className={`nav-link${active ? ' nav-link-active' : ''}`}
               >
+                <Icon size={16} />
                 {label}
               </Link>
             );
