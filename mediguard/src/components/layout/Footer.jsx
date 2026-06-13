@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { ShieldCheck } from 'lucide-react';
 import styles from './Footer.module.css';
 
 export default function Footer() {
@@ -42,53 +42,54 @@ export default function Footer() {
       )}
 
       {/* Footer Content Section */}
-      <div className={`container ${styles.footerContainer}`}>
-        <div className={styles.footerBrand}>
-          <Link href="/" className={styles.footerLogo}>
-            <ShieldCheck size={24} color="var(--accent-secondary)" />
-            MediGuard
-          </Link>
-          <p className={styles.footerDesc}>
-            MediGuard helps consumers and pharmacies assess medicine authenticity using batch verification, supply chain validation, duplicate scan detection, and trust assessment.
-          </p>
-          <span className={styles.footerTrust}>
-            Built for pharmaceutical authenticity verification.
-          </span>
-        </div>
-
-        <div className={styles.footerColumn}>
-          <span className={styles.columnTitle}>Platform</span>
-          <div className={styles.footerLinks}>
-            <Link href="/" className={styles.link}>Home</Link>
-            <Link href="/scan" className={styles.link}>Scan Medicine</Link>
-            <Link href="/report" className={styles.link}>Results</Link>
-            <Link href="/demo" className={styles.link}>Live Demo</Link>
-            <Link href="/#workflow" className={styles.link}>How MediGuard Works</Link>
-            <Link href="/#engine" className={styles.link}>Trust Engine</Link>
+      <div className={styles.footerContent}>
+        <div className={`container ${styles.footerContainer}`}>
+          <div className={styles.footerBrand}>
+            <Link href="/" className={styles.footerLogo}>
+              <Image src="/logo.svg" alt="MediGuard Logo" width={34} height={34} />
+              MediGuard
+            </Link>
+            <p className={styles.footerDesc}>
+              MediGuard helps consumers and pharmacies assess medicine authenticity using batch verification, supply chain validation, duplicate scan detection, and trust assessment.
+            </p>
+            <span className={styles.footerTrust}>
+              Built for pharmaceutical authenticity verification.
+            </span>
           </div>
-        </div>
 
-        <div className={styles.footerColumn}>
-          <span className={styles.columnTitle}>Verification</span>
-          <div className={styles.footerLinks}>
-            <Link href="/demo" className={styles.link}>Batch Verification</Link>
-            <Link href="/demo" className={styles.link}>Hash Validation</Link>
-            <Link href="/demo" className={styles.link}>Supply Chain Validation</Link>
-            <Link href="/demo" className={styles.link}>Geographic Validation</Link>
-            <Link href="/demo" className={styles.link}>Duplicate Scan Analysis</Link>
-            <Link href="/demo" className={styles.link}>Trust Assessment</Link>
+          <div className={styles.footerColumn}>
+            <span className={styles.columnTitle}>Platform</span>
+            <div className={styles.footerLinks}>
+              <Link href="/" className={styles.link}>Home</Link>
+              <Link href="/scan" className={styles.link}>Scan Medicine</Link>
+              <Link href="/results" className={styles.link}>Results</Link>
+              <Link href="/history" className={styles.link}>Scan History</Link>
+              <Link href="/pharmacies" className={styles.link}>Pharmacies</Link>
+              <Link href="/demo" className={styles.link}>Live Demo</Link>
+            </div>
           </div>
-        </div>
 
-        <div className={styles.footerColumn}>
-          <span className={styles.columnTitle}>Resources</span>
-          <div className={styles.footerLinks}>
-            <Link href="#" className={styles.link}>Documentation</Link>
-            <Link href="#" className={styles.link}>Project Overview</Link>
-            <Link href="#" className={styles.link}>Future Roadmap</Link>
-            <Link href="#" className={styles.link}>Privacy Policy</Link>
-            <Link href="#" className={styles.link}>Terms of Use</Link>
-            <Link href="#" className={styles.link}>Contact</Link>
+          <div className={styles.footerColumn}>
+            <span className={styles.columnTitle}>Verification</span>
+            <div className={styles.footerLinks}>
+              <Link href="/demo" className={styles.link}>Batch Verification</Link>
+              <Link href="/demo" className={styles.link}>Hash Validation</Link>
+              <Link href="/demo" className={styles.link}>Supply Chain</Link>
+              <Link href="/demo" className={styles.link}>Geo Validation</Link>
+              <Link href="/demo" className={styles.link}>Clone Detection</Link>
+              <Link href="/demo" className={styles.link}>Trust Assessment</Link>
+            </div>
+          </div>
+
+          <div className={styles.footerColumn}>
+            <span className={styles.columnTitle}>Resources</span>
+            <div className={styles.footerLinks}>
+              <span className={styles.linkDisabled}>Documentation</span>
+              <span className={styles.linkDisabled}>Project Overview</span>
+              <span className={styles.linkDisabled}>Future Roadmap</span>
+              <Link href="/login" className={styles.link}>Login / Sign Up</Link>
+              <Link href="/report" className={styles.link}>Report Counterfeit</Link>
+            </div>
           </div>
         </div>
       </div>

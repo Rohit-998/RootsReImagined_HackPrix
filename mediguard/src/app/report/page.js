@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { ShieldAlert, Flag, CheckCircle2, ArrowLeft, Loader2, MapPin, User, FileText, Mic, MessageSquare, AudioLines, StopCircle, Globe } from 'lucide-react';
 import { SUPPORTED_LANGUAGES, REPORT_PROMPTS } from '@/utils/languages';
+import styles from './page.module.css';
 
 function createRecognition(langCode) {
   if (typeof window === 'undefined') return null;
@@ -248,56 +249,55 @@ function ReportPageContent() {
     finally { setLoading(false); }
   };
 
-  const labelStyle = { display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '6px' };
-  const inputStyle = { width: '100%', padding: '10px 14px', background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', color: 'var(--text-primary)', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box' };
-
   if (submitted) {
     return (
-      <div style={{ maxWidth: '520px', margin: '4rem auto', textAlign: 'center', padding: '0 1rem' }}>
+      <div className={styles.successCard}>
         <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(5, 150, 105, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', border: '2px solid var(--color-verified)' }}>
           <CheckCircle2 size={40} style={{ color: 'var(--color-verified)' }} />
         </div>
-        <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>Report Submitted</h1>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem', lineHeight: 1.6 }}>Thank you for reporting. The pharmacy trust score has been flagged for review.</p>
-        <div style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', padding: '12px', margin: '1.5rem 0', display: 'inline-block' }}>
-          <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', margin: 0 }}>Report Reference ID</p>
-          <p style={{ color: 'var(--text-primary)', fontFamily: 'monospace', fontWeight: 700, fontSize: '1rem', margin: 0 }}>{String(reportId).slice(-10).toUpperCase()}</p>
+        <h1 className={styles.title} style={{ marginBottom: '0.75rem' }}>Report Submitted</h1>
+        <p className={styles.subtitle} style={{ marginBottom: '2rem' }}>Thank you for reporting. The pharmacy trust score has been flagged for review.</p>
+        <div style={{ background: 'var(--bg-primary)', border: '1px solid #111827', borderRadius: 'var(--radius-md)', padding: '16px', margin: '0 auto 2rem', display: 'inline-block' }}>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600, margin: '0 0 4px 0' }}>Report Reference ID</p>
+          <p style={{ color: 'var(--text-primary)', fontFamily: 'monospace', fontWeight: 800, fontSize: '1.25rem', margin: 0 }}>{String(reportId).slice(-10).toUpperCase()}</p>
         </div>
-        <button onClick={() => router.push('/')} style={{ padding: '10px 28px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--accent-primary)', background: 'var(--accent-primary)', color: 'white', fontWeight: 600, cursor: 'pointer', fontSize: '0.9rem' }}>Back to Home</button>
+        <div>
+          <button onClick={() => router.push('/')} className={styles.homeBtn}>Back to Home</button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div style={{ maxWidth: '560px', margin: '2rem auto', padding: '0 1rem' }}>
-      <button onClick={() => router.back()} style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '1.5rem', fontSize: '0.875rem', fontWeight: 600, fontFamily: 'var(--font-sans)' }}><ArrowLeft size={16} /> Back</button>
+    <div className={styles.container}>
+      <button onClick={() => router.back()} className={styles.backBtn}><ArrowLeft size={18} /> Back</button>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '1.5rem' }}>
-        <div style={{ width: '48px', height: '48px', borderRadius: 'var(--radius-sm)', background: 'rgba(220, 38, 38, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Flag size={24} style={{ color: 'var(--color-danger)' }} />
+      <div className={styles.header}>
+        <div className={styles.headerIcon}>
+          <Flag size={32} style={{ color: 'var(--color-danger)' }} />
         </div>
         <div>
-          <h1 style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--text-primary)', margin: 0 }}>Report Counterfeit Medicine</h1>
-          <p style={{ color: 'var(--text-secondary)', margin: '4px 0 0', fontSize: '0.9rem' }}>Help protect others. Your report is anonymous.</p>
+          <h1 className={styles.title}>Report Counterfeit Medicine</h1>
+          <p className={styles.subtitle}>Help protect others. Your report is anonymous.</p>
         </div>
       </div>
 
       {batchId && (
-        <div style={{ background: 'rgba(220, 38, 38, 0.06)', border: '1px solid rgba(220, 38, 38, 0.2)', borderRadius: 'var(--radius-md)', padding: '12px 16px', marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className={styles.infoPanel}>
           <div>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: 600, margin: 0 }}>REPORTING MEDICINE</p>
-            <p style={{ color: 'var(--text-primary)', fontWeight: 700, fontFamily: 'monospace', margin: '2px 0 0' }}>{batchId}</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 700, margin: '0 0 4px 0' }}>REPORTING MEDICINE</p>
+            <p style={{ color: 'var(--text-primary)', fontWeight: 800, fontFamily: 'monospace', fontSize: '1.25rem', margin: 0 }}>{batchId}</p>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: 600, margin: 0 }}>TRUST SCORE</p>
-            <p style={{ color: 'var(--color-danger)', fontWeight: 700, fontSize: '1.1rem', margin: '2px 0 0' }}>{trustScore}/100</p>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 700, margin: '0 0 4px 0' }}>TRUST SCORE</p>
+            <p style={{ color: 'var(--color-danger)', fontWeight: 800, fontSize: '1.25rem', margin: 0 }}>{trustScore}/100</p>
           </div>
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '2rem', background: 'var(--bg-primary)', padding: '4px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
-        <button onClick={() => { setActiveMode('form'); stopAssistant(); }} style={{ flex: 1, padding: '10px', borderRadius: 'var(--radius-sm)', border: 'none', background: activeMode === 'form' ? 'var(--bg-surface)' : 'transparent', color: activeMode === 'form' ? 'var(--text-primary)' : 'var(--text-muted)', fontWeight: 600, cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', fontSize: '0.85rem', boxShadow: activeMode === 'form' ? 'var(--shadow-sm)' : 'none', fontFamily: 'var(--font-sans)' }}><FileText size={16} /> Manual Form</button>
-        <button onClick={() => setActiveMode('voice')} style={{ flex: 1, padding: '10px', borderRadius: 'var(--radius-sm)', border: 'none', background: activeMode === 'voice' ? 'var(--bg-surface)' : 'transparent', color: activeMode === 'voice' ? 'var(--text-primary)' : 'var(--text-muted)', fontWeight: 600, cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', fontSize: '0.85rem', boxShadow: activeMode === 'voice' ? 'var(--shadow-sm)' : 'none', fontFamily: 'var(--font-sans)' }}><Mic size={16} /> Voice Assistant</button>
+      <div className={styles.tabs}>
+        <button onClick={() => { setActiveMode('form'); stopAssistant(); }} className={`${styles.tab} ${activeMode === 'form' ? styles.tabActive : ''}`}><FileText size={18} /> Manual Form</button>
+        <button onClick={() => setActiveMode('voice')} className={`${styles.tab} ${activeMode === 'voice' ? styles.tabActive : ''}`}><Mic size={18} /> Voice Assistant</button>
       </div>
 
       {activeMode === 'voice' && voiceState === 'idle' && (
@@ -319,63 +319,63 @@ function ReportPageContent() {
       )}
 
       {activeMode === 'form' ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          <div>
-            <label style={labelStyle}><User size={14} /> Your Name <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(optional)</span></label>
-            <input placeholder="e.g. Rahul Sharma" value={form.reporter_name} onChange={set('reporter_name')} style={inputStyle} />
+        <div>
+          <div className={styles.formGroup}>
+            <label className={styles.label}><User size={16} /> Your Name <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>(optional)</span></label>
+            <input placeholder="e.g. Rahul Sharma" value={form.reporter_name} onChange={set('reporter_name')} className={styles.input} />
           </div>
-          <div>
-            <label style={labelStyle}><ShieldAlert size={14} /> Pharmacy Name <span style={{ color: 'var(--color-danger)' }}>*</span></label>
-            <input placeholder="e.g. Sharma Medical Store" value={form.pharmacy_name} onChange={set('pharmacy_name')} style={inputStyle} />
+          <div className={styles.formGroup}>
+            <label className={styles.label}><ShieldAlert size={16} /> Pharmacy Name <span style={{ color: 'var(--color-danger)' }}>*</span></label>
+            <input placeholder="e.g. Sharma Medical Store" value={form.pharmacy_name} onChange={set('pharmacy_name')} className={styles.input} />
           </div>
-          <div>
-            <label style={labelStyle}><MapPin size={14} /> Location / Address</label>
-            <input placeholder="e.g. Dharavi, Mumbai" value={form.location} onChange={set('location')} style={inputStyle} />
+          <div className={styles.formGroup}>
+            <label className={styles.label}><MapPin size={16} /> Location / Address</label>
+            <input placeholder="e.g. Dharavi, Mumbai" value={form.location} onChange={set('location')} className={styles.input} />
           </div>
-          <div>
-            <label style={labelStyle}><FileText size={14} /> Additional Notes</label>
-            <textarea placeholder="Describe what you noticed..." value={form.additional_notes} onChange={set('additional_notes')} rows={4} style={{ ...inputStyle, resize: 'vertical', fontFamily: 'inherit' }} />
+          <div className={styles.formGroup}>
+            <label className={styles.label}><FileText size={16} /> Additional Notes</label>
+            <textarea placeholder="Describe what you noticed..." value={form.additional_notes} onChange={set('additional_notes')} rows={4} className={styles.input} style={{ resize: 'vertical' }} />
           </div>
-          {error && <p style={{ color: 'var(--color-danger)', fontSize: '0.85rem', margin: 0 }}>{error}</p>}
-          <button onClick={handleSubmit} disabled={loading} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-danger)', cursor: loading ? 'not-allowed' : 'pointer', background: 'var(--color-danger)', color: 'white', fontWeight: 600, fontSize: '0.9rem', opacity: loading ? 0.6 : 1, fontFamily: 'var(--font-sans)' }}>
-            {loading ? <><Loader2 size={16} className="animate-spin" /> Submitting...</> : <><Flag size={16} /> Submit Report</>}
+          {error && <p style={{ color: 'var(--color-danger)', fontSize: '0.95rem', fontWeight: 600, margin: '0 0 1rem 0' }}>{error}</p>}
+          <button onClick={handleSubmit} disabled={loading} className={styles.submitBtn}>
+            {loading ? <><Loader2 size={18} className="animate-spin" /> Submitting...</> : <><Flag size={18} /> Submit Report</>}
           </button>
         </div>
       ) : (
-        <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1.5rem', textAlign: 'center' }}>
-          <div style={{ width: '80px', height: '80px', margin: '0 auto 1.5rem', borderRadius: '50%', background: voiceState === 'listening' ? 'rgba(220, 38, 38, 0.1)' : voiceState === 'speaking' ? 'rgba(30, 58, 95, 0.1)' : 'var(--bg-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border-color)' }}>
-            {voiceState === 'listening' ? <Mic size={32} color="var(--color-danger)" /> : <AudioLines size={32} color={voiceState === 'speaking' ? 'var(--accent-primary)' : 'var(--text-muted)'} />}
+        <div className={styles.voicePanel}>
+          <div className={styles.voiceIcon} style={{ background: voiceState === 'listening' ? 'rgba(220, 38, 38, 0.1)' : voiceState === 'speaking' ? 'rgba(30, 58, 95, 0.1)' : 'var(--bg-primary)' }}>
+            {voiceState === 'listening' ? <Mic size={32} color="var(--color-danger)" /> : <AudioLines size={32} color={voiceState === 'speaking' ? 'var(--text-primary)' : 'var(--text-muted)'} />}
           </div>
 
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
-            {voiceState === 'idle' ? 'Voice Report' : voiceState === 'speaking' ? 'AI is speaking...' : voiceState === 'listening' ? 'Listening...' : 'Processing...'}
+          <h2 className={styles.voiceTitle}>
+            {voiceState === 'idle' ? 'Voice Assistant' : voiceState === 'speaking' ? 'AI is speaking...' : voiceState === 'listening' ? 'Listening...' : 'Processing...'}
           </h2>
 
-          <div style={{ minHeight: '100px', maxHeight: '200px', overflowY: 'auto', marginBottom: '1.5rem', padding: '1rem', background: 'var(--bg-primary)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', textAlign: 'left' }}>
-            {chatLog.length === 0 && voiceState === 'idle' && <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.85rem', textAlign: 'center' }}>Press start and the AI will guide you through the reporting process.</p>}
+          <div className={styles.chatLog}>
+            {chatLog.length === 0 && voiceState === 'idle' && <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.95rem', textAlign: 'center', fontWeight: 600 }}>Press start and the AI will guide you through the reporting process.</p>}
             {chatLog.map((msg, i) => (
-              <div key={i} style={{ marginBottom: '8px' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: msg.role === 'ai' ? 'var(--accent-primary)' : 'var(--color-verified)' }}>{msg.role === 'ai' ? 'AI' : 'You'}:</span>
-                <p style={{ margin: '2px 0 0', fontSize: '0.85rem', color: 'var(--text-primary)' }}>{msg.text}</p>
+              <div key={i} style={{ marginBottom: '12px' }}>
+                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: msg.role === 'ai' ? 'var(--text-primary)' : 'var(--color-verified)' }}>{msg.role === 'ai' ? 'AI Assistant' : 'You'}:</span>
+                <p style={{ margin: '4px 0 0', fontSize: '1.05rem', color: 'var(--text-secondary)' }}>{msg.text}</p>
               </div>
             ))}
             {voiceState === 'listening' && (
-              <div style={{ marginBottom: '8px', background: 'rgba(5, 150, 105, 0.05)', padding: '8px', borderRadius: 'var(--radius-sm)' }}>
-                <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-verified)' }}>You:</span>
-                <p style={{ margin: '2px 0 0', fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: 600 }}>{transcript || '...'}</p>
+              <div style={{ marginBottom: '12px', background: 'var(--bg-surface)', padding: '12px', border: '1px solid #111827', borderRadius: 'var(--radius-md)', boxShadow: '4px 4px 0px rgba(17, 24, 39, 0.05)' }}>
+                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--color-verified)' }}>You:</span>
+                <p style={{ margin: '4px 0 0', fontSize: '1.05rem', color: 'var(--text-primary)', fontWeight: 600 }}>{transcript || '...'}</p>
               </div>
             )}
           </div>
 
-          {error && <p style={{ color: 'var(--color-danger)', fontSize: '0.85rem', marginBottom: '1rem' }}>{error}</p>}
+          {error && <p style={{ color: 'var(--color-danger)', fontSize: '0.95rem', fontWeight: 600, marginBottom: '1rem' }}>{error}</p>}
 
           {voiceState === 'idle' ? (
-            <button onClick={startVoiceAssistant} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px 24px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--accent-primary)', cursor: 'pointer', background: 'var(--accent-primary)', color: 'white', fontWeight: 600, fontSize: '0.9rem', width: '100%', fontFamily: 'var(--font-sans)' }}>
-              <MessageSquare size={16} /> Start Voice Assistant
+            <button onClick={startVoiceAssistant} className={styles.startVoiceBtn}>
+              <MessageSquare size={18} /> Start Voice Assistant
             </button>
           ) : (
-            <button onClick={stopAssistant} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px 24px', borderRadius: 'var(--radius-sm)', cursor: 'pointer', background: 'transparent', color: 'var(--color-danger)', fontWeight: 600, fontSize: '0.9rem', width: '100%', border: '1px solid var(--color-danger)', fontFamily: 'var(--font-sans)' }}>
-              <StopCircle size={16} /> Cancel
+            <button onClick={stopAssistant} className={styles.cancelBtn}>
+              <StopCircle size={18} /> Cancel
             </button>
           )}
         </div>

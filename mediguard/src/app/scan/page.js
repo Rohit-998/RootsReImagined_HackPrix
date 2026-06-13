@@ -260,7 +260,7 @@ export default function ScanPage() {
 
       <div className={styles.layout}>
         <div className={styles.leftCol}>
-          <Card className={styles.inputCard}>
+          <div className={`${styles.card} ${styles.inputCard}`}>
             <div className={styles.tabs}>
               <button
                 className={`${styles.tab} ${activeTab === 'scan' ? styles.activeTab : ''}`}
@@ -347,7 +347,7 @@ export default function ScanPage() {
                 </div>
               )}
             </div>
-          </Card>
+          </div>
 
           <div className={styles.recentScans}>
             <h3 className={styles.sectionTitle}>
@@ -374,7 +374,7 @@ export default function ScanPage() {
         </div>
 
         <div className={styles.rightCol}>
-          <Card className={styles.progressCard}>
+          <div className={`${styles.card} ${styles.progressCard}`}>
             <h3 className={styles.panelTitle}>Verification Progress</h3>
             <div className={styles.stepsList}>
               {verificationSteps.map((step) => (
@@ -397,7 +397,7 @@ export default function ScanPage() {
                 {isVerifying ? 'Running verification layers...' : 'Waiting for input...'}
               </p>
             </div>
-          </Card>
+          </div>
         </div>
       </div>
     </div>

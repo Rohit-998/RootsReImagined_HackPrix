@@ -6,6 +6,11 @@ export const metadata = {
   title: "MediGuard | Medicine Verification System",
   description: "Pharmaceutical authenticity verification platform. Verify your medicines in seconds.",
   manifest: "/manifest.json",
+  icons: {
+    icon: '/logo.svg',
+    shortcut: '/logo.svg',
+    apple: '/logo.svg',
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -22,10 +27,11 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head>
         <link rel="manifest" href="/manifest.json" />
+        <link rel="icon" type="image/svg+xml" href="/logo.svg" />
         <meta name="theme-color" content="#5B46FF" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <link rel="apple-touch-icon" href="/icon-512.png" />
+        <link rel="apple-touch-icon" href="/logo.svg" />
       </head>
       <body>
         <Navbar />

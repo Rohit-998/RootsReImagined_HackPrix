@@ -7,32 +7,45 @@
 }
 
 .title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  margin-bottom: var(--spacing-xs);
+  font-size: 2.75rem;
+  font-weight: 800;
+  margin-bottom: var(--spacing-sm);
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
 .subtitle {
-  font-size: 0.95rem;
+  font-size: 1.15rem;
   color: var(--text-secondary);
+  max-width: 600px;
+  line-height: 1.6;
 }
 
 .layout {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--spacing-xl);
+  gap: 2.5rem;
+  margin-top: 1rem;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .layout {
-    grid-template-columns: 3fr 2fr;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 4rem;
   }
+}
+
+.card {
+  background-color: var(--bg-surface);
 }
 
 .inputCard {
   padding: 0;
   overflow: hidden;
   margin-bottom: var(--spacing-xl);
+  border: 1px solid #111827;
+  border-radius: var(--radius-lg);
+  box-shadow: 4px 4px 0px rgba(17, 24, 39, 0.05);
 }
 
 .tabs {
@@ -46,70 +59,72 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-md);
-  background: var(--bg-surface);
+  gap: 10px;
+  padding: 18px;
+  background: var(--bg-primary);
   border: none;
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: var(--text-secondary);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-muted);
   cursor: pointer;
   transition: all 0.2s ease;
-  font-family: var(--font-sans);
-  border-bottom: 2px solid transparent;
+  font-family: inherit;
+  border-bottom: 2px solid var(--border-color);
 }
 
 .tab:hover {
-  background-color: var(--bg-primary);
   color: var(--text-primary);
 }
 
 .activeTab {
-  color: var(--accent-primary);
-  border-bottom-color: var(--accent-primary);
+  color: var(--text-primary);
+  border-bottom-color: #111827;
   background-color: var(--bg-surface);
 }
 
 .inputContent {
-  padding: var(--spacing-lg);
+  padding: 2.5rem;
+  background-color: var(--bg-surface);
 }
 
 .scannerContainer {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: 2rem;
 }
 
 .scannerFrame {
   position: relative;
   width: 100%;
   aspect-ratio: 1;
-  max-width: 360px;
+  max-width: 440px;
   margin: 0 auto;
-  background-color: #111827;
-  border: 2px solid var(--accent-primary);
-  border-radius: var(--radius-md);
+  background-color: #050505;
+  border: 4px solid #111827;
+  border-radius: var(--radius-lg);
+  box-shadow: 8px 8px 0px rgba(17, 24, 39, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  transition: all 0.3s ease;
 }
 
 .scannerLine {
   position: absolute;
   left: 0;
   width: 100%;
-  height: 2px;
-  background-color: var(--accent-secondary);
-  box-shadow: 0 0 12px var(--accent-secondary);
+  height: 3px;
+  background-color: var(--accent-primary);
+  box-shadow: 0 0 15px var(--accent-primary);
   animation: scanPulse 2s ease-in-out infinite;
 }
 
 .scannerCorner {
   position: absolute;
-  width: 32px;
-  height: 32px;
-  border-color: var(--accent-secondary);
+  width: 40px;
+  height: 40px;
+  border-color: var(--accent-primary);
   border-style: solid;
   border-width: 0;
   z-index: 2;
@@ -121,11 +136,13 @@
 .br { bottom: 16px; right: 16px; border-bottom-width: 3px; border-right-width: 3px; border-radius: 2px; }
 
 .scannerText {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.05rem;
+  font-weight: 500;
   z-index: 10;
   text-align: center;
-  padding: 1rem;
+  padding: 2rem;
+  max-width: 80%;
 }
 
 .videoFeed {
@@ -138,7 +155,7 @@
 
 .scannerActions {
   display: flex;
-  gap: 8px;
+  gap: 16px;
 }
 
 @media (max-width: 480px) {
@@ -149,72 +166,96 @@
 
 .fullWidthBtn {
   flex: 1;
+  padding: 16px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  background-color: #111827 !important;
+  color: #FFFFFF !important;
+  border: 1px solid #111827 !important;
+  box-shadow: 4px 4px 0px rgba(17, 24, 39, 0.15);
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+}
+
+.fullWidthBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 6px 6px 0px rgba(17, 24, 39, 0.25);
 }
 
 .errorText {
   color: var(--color-danger);
-  font-size: 0.85rem;
+  font-size: 0.95rem;
+  font-weight: 600;
   margin: 0;
+  background: rgba(239, 68, 68, 0.1);
+  padding: 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .manualEntry {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: 1.5rem;
 }
 
 .formGroup {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .formGroup label {
-  font-weight: 600;
-  font-size: 0.85rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-primary);
 }
 
 .input {
-  padding: 10px 14px;
+  padding: 14px 16px;
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  font-size: 0.95rem;
-  font-family: var(--font-sans);
-  background-color: var(--bg-surface);
+  border-radius: var(--radius-md);
+  font-size: 1.05rem;
+  font-family: inherit;
+  background-color: var(--bg-primary);
   color: var(--text-primary);
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
   outline: none;
 }
 
 .input:focus {
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 2px rgba(91, 70, 255, 0.1);
+  border-color: #111827;
+  box-shadow: 0 0 0 1px #111827;
+  background-color: var(--bg-surface);
 }
 
 .sectionTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  font-size: 0.95rem;
-  font-weight: 600;
-  margin-bottom: var(--spacing-md);
+  gap: 10px;
 }
 
 .recentScans {
-  margin-top: var(--spacing-lg);
+  margin-top: 3rem;
 }
 
 .recentList {
   display: flex;
   flex-direction: column;
+  gap: 1rem;
 }
 
 .emptyState {
-  padding: var(--spacing-lg);
+  padding: 2rem;
   text-align: center;
+  background: var(--bg-surface);
   border: 1px dashed var(--border-color);
-  border-radius: var(--radius-sm);
-  font-size: 0.85rem;
+  border-radius: var(--radius-lg);
+  font-size: 0.95rem;
   color: var(--text-muted);
 }
 
@@ -222,25 +263,33 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--border-color);
+  padding: 16px 20px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  transition: transform 0.2s ease;
+}
+
+.recentItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 0 rgba(17, 24, 39, 0.05);
 }
 
 .recentItem:last-child {
-  border-bottom: none;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .recentName {
-  font-size: 0.9rem;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 700;
   color: var(--text-primary);
   margin: 0;
 }
 
 .recentTime {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  margin: 2px 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 4px 0 0;
 }
 
 .recentScore {
@@ -250,27 +299,40 @@
 
 .progressCard {
   position: sticky;
-  top: calc(76px + var(--spacing-xl));
+  top: calc(100px + 2rem);
+  padding: 2.5rem;
+  border: 1px solid #111827;
+  border-radius: var(--radius-lg);
+  box-shadow: 6px 6px 0px rgba(17, 24, 39, 0.05);
 }
 
 .panelTitle {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: var(--spacing-lg);
-  padding-bottom: var(--spacing-sm);
-  border-bottom: 1px solid var(--border-color);
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--border-color);
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
 .stepsList {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: 1.25rem;
 }
 
 .step {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
+  gap: 1.25rem;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  transition: background 0.2s ease;
+}
+
+.step:hover {
+  background: var(--bg-primary);
 }
 
 .stepIcon {
@@ -286,8 +348,8 @@
 .iconError { color: var(--color-danger); }
 
 .stepLabel {
-  font-weight: 500;
-  font-size: 0.9rem;
+  font-weight: 600;
+  font-size: 1.05rem;
 }
 
 .text-pending { color: var(--text-muted); }
@@ -296,16 +358,18 @@
 .text-error { color: var(--text-primary); }
 
 .progressFooter {
-  margin-top: var(--spacing-xl);
-  padding-top: var(--spacing-md);
-  border-top: 1px solid var(--border-color);
+  margin-top: 2.5rem;
+  padding: 2rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius-md);
   text-align: center;
+  border: 1px dashed var(--border-color);
 }
 
 .waitingText {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  font-style: italic;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
 @media (max-width: 768px) {
@@ -314,5 +378,44 @@
   }
   .scanContainer {
     padding: var(--spacing-lg) var(--spacing-md);
+  }
+  .title {
+    font-size: 2rem;
+  }
+  .subtitle {
+    font-size: 1rem;
+  }
+  .inputContent {
+    padding: 1.5rem;
+  }
+  .panelTitle {
+    font-size: 1.25rem;
+  }
+  .progressCard {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 1.65rem;
+  }
+  .tab {
+    font-size: 0.85rem;
+    padding: 14px 10px;
+    gap: 6px;
+  }
+  .inputContent {
+    padding: 1.25rem;
+  }
+  .scannerFrame {
+    max-width: 320px;
+  }
+  .fullWidthBtn {
+    font-size: 0.95rem;
+    padding: 14px;
+  }
+  .recentScans {
+    margin-top: 2rem;
   }
 }
