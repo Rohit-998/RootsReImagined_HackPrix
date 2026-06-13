@@ -30,6 +30,16 @@ const medicineSchema = new mongoose.Schema({
   exp_date: { type: Date, required: true },
   is_genuine: { type: Boolean, default: true },
   authorized_region: { type: String, required: true },
+  recalled: { type: Boolean, default: false },
+  recall_reason: { type: String },
+  recall_date: { type: Date },
+  category: { type: String },
+  strength: { type: String },
+  dosage: { type: String },
+  side_effects: [{ type: String }],
+  instructions: { type: String },
+  alternatives: [{ type: String }],
+  drug_interactions: [{ type: String }],
 }, { timestamps: true });
 
 const supplyChainEventSchema = new mongoose.Schema({
@@ -52,10 +62,31 @@ const scanLogSchema = new mongoose.Schema({
     scanned_serial_number: { type: String },
 }, { timestamps: true });
 
+const drugInteractionSchema = new mongoose.Schema({
+  drug_a: { type: String, required: true },
+  drug_b: { type: String, required: true },
+  severity: { type: String, enum: ['mild', 'moderate', 'severe', 'contraindicated'], required: true },
+  description: { type: String, required: true },
+  recommendation: { type: String, required: true },
+}, { timestamps: true });
+
+const userSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
+  password_hash: { type: String, required: true },
+  role: { type: String, enum: ['consumer', 'pharmacy', 'manufacturer', 'regulator'], default: 'consumer' },
+  organization: { type: String },
+  api_key: { type: String, unique: true, sparse: true },
+  manufacturer_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Manufacturer' },
+  active: { type: Boolean, default: true },
+}, { timestamps: true });
+
 const Manufacturer = mongoose.models.Manufacturer || mongoose.model('Manufacturer', manufacturerSchema);
 const Medicine = mongoose.models.Medicine || mongoose.model('Medicine', medicineSchema);
 const SupplyChainEvent = mongoose.models.SupplyChainEvent || mongoose.model('SupplyChainEvent', supplyChainEventSchema);
 const ScanLog = mongoose.models.ScanLog || mongoose.model('ScanLog', scanLogSchema);
+const DrugInteraction = mongoose.models.DrugInteraction || mongoose.model('DrugInteraction', drugInteractionSchema);
+const User = mongoose.models.User || mongoose.model('User', userSchema);
 
 function generateHash(batchId, serialNumber) {
   const data = `${batchId}:${serialNumber}:${SECRET_KEY}`;
@@ -76,6 +107,8 @@ async function seed() {
   await Medicine.deleteMany({});
   await SupplyChainEvent.deleteMany({});
   await ScanLog.deleteMany({});
+  await DrugInteraction.deleteMany({});
+  await User.deleteMany({});
   console.log("Cleared existing data.");
 
   // 1. Create Manufacturers
@@ -108,9 +141,16 @@ async function seed() {
     serial_number: "SN-0001",
     hash: generateHash("BATCH-SUN-2024-001", "SN-0001"),
     mfg_date: new Date("2024-01-10"),
-    exp_date: new Date("2026-01-10"),
+    exp_date: new Date("2027-01-10"),
     is_genuine: true,
-    authorized_region: "India-Maharashtra"
+    authorized_region: "India-Maharashtra",
+    category: "analgesic",
+    strength: "500mg",
+    dosage: "1-2 tablets every 4-6 hours as needed. Maximum 8 tablets in 24 hours.",
+    side_effects: ["Nausea", "Allergic skin reactions", "Liver damage (overdose)", "Blood disorders (rare)"],
+    instructions: "Take with water. Do not exceed recommended dose. Avoid alcohol. Consult doctor if symptoms persist beyond 3 days.",
+    alternatives: ["Ibuprofen 400mg", "Aspirin 500mg", "Naproxen 250mg"],
+    drug_interactions: ["Warfarin", "Methotrexate", "Carbamazepine"],
   });
 
   const realAmox = await Medicine.create({
@@ -120,9 +160,16 @@ async function seed() {
     serial_number: "SN-0002",
     hash: generateHash("BATCH-CIP-2024-015", "SN-0002"),
     mfg_date: new Date("2024-02-15"),
-    exp_date: new Date("2025-02-15"),
+    exp_date: new Date("2027-02-15"),
     is_genuine: true,
-    authorized_region: "India-Gujarat"
+    authorized_region: "India-Gujarat",
+    category: "antibiotic",
+    strength: "250mg",
+    dosage: "1 capsule every 8 hours for 7-10 days. Complete the full course.",
+    side_effects: ["Diarrhea", "Nausea", "Skin rash", "Vomiting", "Allergic reactions"],
+    instructions: "Take with or without food. Complete full course even if feeling better. Report any allergic reactions immediately.",
+    alternatives: ["Azithromycin 500mg", "Cephalexin 500mg", "Erythromycin 250mg"],
+    drug_interactions: ["Methotrexate", "Warfarin", "Oral contraceptives"],
   });
 
   // Diverted Medicine (Real, but will be scanned in wrong region during demo)
@@ -133,9 +180,16 @@ async function seed() {
     serial_number: "SN-0003",
     hash: generateHash("BATCH-NOV-2024-003", "SN-0003"),
     mfg_date: new Date("2024-03-01"),
-    exp_date: new Date("2025-03-01"),
+    exp_date: new Date("2027-03-01"),
     is_genuine: true,
-    authorized_region: "Nigeria-Lagos" // We will simulate user in India
+    authorized_region: "Nigeria-Lagos",
+    category: "antidiabetic",
+    strength: "100 IU/mL",
+    dosage: "As directed by physician. Inject subcutaneously 30 minutes before meals.",
+    side_effects: ["Hypoglycemia", "Injection site reactions", "Weight gain", "Allergic reactions"],
+    instructions: "Store in refrigerator (2-8°C). Do not freeze. Rotate injection sites. Monitor blood sugar regularly.",
+    alternatives: ["Insulin Glargine", "Insulin Lispro", "Metformin 500mg"],
+    drug_interactions: ["Beta-blockers", "ACE inhibitors", "Thiazolidinediones"],
   });
 
   // Expired Relabeled
@@ -148,7 +202,14 @@ async function seed() {
     mfg_date: new Date("2021-01-01"),
     exp_date: new Date("2023-01-01"), // Already expired
     is_genuine: true,
-    authorized_region: "India-Delhi"
+    authorized_region: "India-Delhi",
+    category: "antitussive",
+    strength: "100ml",
+    dosage: "10ml every 6-8 hours. Do not exceed 40ml in 24 hours.",
+    side_effects: ["Drowsiness", "Dizziness", "Nausea", "Constipation"],
+    instructions: "Shake well before use. Use measuring cup provided. May cause drowsiness — avoid driving.",
+    alternatives: ["Honey and lemon", "Dextromethorphan syrup", "Guaifenesin syrup"],
+    drug_interactions: ["MAO inhibitors", "Sedatives", "Antihistamines"],
   });
 
   // 3. Create Supply Chain for realPara
@@ -181,9 +242,202 @@ async function seed() {
     scanned_batch_id: realAmox.batch_id,
     scanned_serial_number: realAmox.serial_number,
     location_city: `City ${i}`,
-    result_score: 100 // Previous scans passed, until frequency caught up
+    result_score: 100
   }));
   await ScanLog.insertMany(cloneLogs);
+
+  // 5. Add Metformin (3rd genuine medicine from plan)
+  const drReddys = await Manufacturer.create({
+    name: "Dr. Reddy's",
+    country: "India",
+    verified: true,
+    secret_key: SECRET_KEY
+  });
+
+  const realMetformin = await Medicine.create({
+    name: "Metformin 500mg",
+    manufacturer_id: drReddys._id,
+    batch_id: "BATCH-DRL-2024-008",
+    serial_number: "SN-0005",
+    hash: generateHash("BATCH-DRL-2024-008", "SN-0005"),
+    mfg_date: new Date("2024-04-01"),
+    exp_date: new Date("2027-04-01"),
+    is_genuine: true,
+    authorized_region: "India-Telangana",
+    category: "antidiabetic",
+    strength: "500mg",
+    dosage: "1 tablet twice daily with meals. May be increased to 1000mg twice daily.",
+    side_effects: ["Nausea", "Diarrhea", "Stomach pain", "Metallic taste", "Lactic acidosis (rare)"],
+    instructions: "Take with food to reduce stomach upset. Do not crush or chew extended-release tablets. Monitor blood sugar regularly.",
+    alternatives: ["Glimepiride 1mg", "Sitagliptin 100mg", "Gliclazide 80mg"],
+    drug_interactions: ["Insulin", "ACE inhibitors", "Alcohol", "Contrast dye"],
+  });
+
+  // Supply chain for Metformin
+  let prevHash2 = "GENESIS";
+  const metEvents = [
+    { type: "manufactured", loc: "Hyderabad Plant", time: "2024-04-01T08:00:00Z" },
+    { type: "qa_passed", loc: "Hyderabad QC Lab", time: "2024-04-02T11:00:00Z" },
+    { type: "shipped", loc: "Secunderabad Warehouse", time: "2024-04-05T10:00:00Z" },
+    { type: "received", loc: "City Pharmacy, Hyderabad", time: "2024-04-10T14:00:00Z" }
+  ];
+
+  for (const ev of metEvents) {
+    const evData = { type: ev.type, location: ev.loc, timestamp: new Date(ev.time) };
+    const eventHash = generateEventHash(prevHash2, evData);
+    await SupplyChainEvent.create({
+      medicine_id: realMetformin._id,
+      event_type: ev.type,
+      location: ev.loc,
+      timestamp: evData.timestamp,
+      prev_hash: prevHash2,
+      event_hash: eventHash
+    });
+    prevHash2 = eventHash;
+  }
+
+  // Supply chain for Amoxicillin
+  let prevHash3 = "GENESIS";
+  const amoxEvents = [
+    { type: "manufactured", loc: "Cipla Mumbai Factory", time: "2024-02-15T09:00:00Z" },
+    { type: "qa_passed", loc: "Mumbai QC Lab", time: "2024-02-16T12:00:00Z" },
+    { type: "shipped", loc: "Ahmedabad Distributor", time: "2024-02-20T08:00:00Z" },
+    { type: "received", loc: "Gujarat Medical Store", time: "2024-02-25T16:00:00Z" }
+  ];
+
+  for (const ev of amoxEvents) {
+    const evData = { type: ev.type, location: ev.loc, timestamp: new Date(ev.time) };
+    const eventHash = generateEventHash(prevHash3, evData);
+    await SupplyChainEvent.create({
+      medicine_id: realAmox._id,
+      event_type: ev.type,
+      location: ev.loc,
+      timestamp: evData.timestamp,
+      prev_hash: prevHash3,
+      event_hash: eventHash
+    });
+    prevHash3 = eventHash;
+  }
+
+  // 7. Seed Drug Interactions
+  console.log("Seeding drug interactions...");
+  await DrugInteraction.insertMany([
+    {
+      drug_a: "Paracetamol 500mg",
+      drug_b: "Warfarin",
+      severity: "moderate",
+      description: "Paracetamol may enhance the anticoagulant effect of warfarin, increasing bleeding risk.",
+      recommendation: "Monitor INR closely. Limit paracetamol to less than 2g/day when on warfarin."
+    },
+    {
+      drug_a: "Paracetamol 500mg",
+      drug_b: "Metformin 500mg",
+      severity: "mild",
+      description: "No significant direct interaction, but both are metabolized by the liver.",
+      recommendation: "Generally safe to take together. Monitor liver function if used long-term."
+    },
+    {
+      drug_a: "Amoxicillin 250mg",
+      drug_b: "Methotrexate",
+      severity: "severe",
+      description: "Amoxicillin can reduce renal clearance of methotrexate, leading to toxic levels.",
+      recommendation: "Avoid combination. If necessary, monitor methotrexate levels and renal function closely."
+    },
+    {
+      drug_a: "Amoxicillin 250mg",
+      drug_b: "Warfarin",
+      severity: "moderate",
+      description: "Amoxicillin may increase INR and risk of bleeding when combined with warfarin.",
+      recommendation: "Monitor INR more frequently during and after amoxicillin course."
+    },
+    {
+      drug_a: "Metformin 500mg",
+      drug_b: "Insulin Novolin R",
+      severity: "moderate",
+      description: "Combined use increases the risk of hypoglycemia. Both lower blood sugar.",
+      recommendation: "Monitor blood glucose closely. Dose adjustment may be needed."
+    },
+    {
+      drug_a: "Metformin 500mg",
+      drug_b: "Contrast dye",
+      severity: "severe",
+      description: "Iodinated contrast media with metformin can cause lactic acidosis, a life-threatening condition.",
+      recommendation: "Stop metformin 48 hours before contrast procedure. Resume only after kidney function confirmed normal."
+    },
+    {
+      drug_a: "Cough Syrup",
+      drug_b: "Sedatives",
+      severity: "severe",
+      description: "Combined CNS depressant effects can cause excessive drowsiness, respiratory depression.",
+      recommendation: "Avoid combination. If necessary, use lowest effective doses and monitor closely."
+    },
+    {
+      drug_a: "Insulin Novolin R",
+      drug_b: "Beta-blockers",
+      severity: "moderate",
+      description: "Beta-blockers can mask symptoms of hypoglycemia and may alter glucose metabolism.",
+      recommendation: "Monitor blood sugar more frequently. Be aware that typical warning signs of low sugar may be absent."
+    },
+  ]);
+
+  // 8. Seed Demo Users
+  console.log("Seeding demo users...");
+  const salt1 = crypto.randomBytes(16).toString('hex');
+  const hash1 = crypto.pbkdf2Sync('demo123', salt1, 1000, 64, 'sha512').toString('hex');
+  const demoPassword = `${salt1}:${hash1}`;
+
+  await User.insertMany([
+    {
+      email: 'consumer@demo.com',
+      name: 'Demo Consumer',
+      password_hash: demoPassword,
+      role: 'consumer',
+      active: true,
+    },
+    {
+      email: 'pharmacy@demo.com',
+      name: 'City Pharmacy',
+      password_hash: demoPassword,
+      role: 'pharmacy',
+      organization: 'City Pharmacy, Mumbai',
+      api_key: 'mg_demo_pharmacy_key_123',
+      active: true,
+    },
+    {
+      email: 'manufacturer@demo.com',
+      name: 'Sun Pharma Admin',
+      password_hash: demoPassword,
+      role: 'manufacturer',
+      organization: 'Sun Pharmaceutical Industries',
+      api_key: 'mg_demo_manufacturer_key_456',
+      manufacturer_id: sunPharma._id,
+      active: true,
+    },
+    {
+      email: 'regulator@demo.com',
+      name: 'CDSCO Inspector',
+      password_hash: demoPassword,
+      role: 'regulator',
+      organization: 'Central Drugs Standard Control Organisation',
+      api_key: 'mg_demo_regulator_key_789',
+      active: true,
+    },
+  ]);
+
+  // 9. Print demo QR data for reference
+  console.log("\n--- DEMO QR DATA ---");
+  console.log("Scenario A (Fake - batch doesn't exist): { batch_id: 'BATCH-FAKE-9999', serial_number: 'SN-FAKE', hash: 'fakehash123' }");
+  console.log(`Scenario B (Cloned QR): { batch_id: '${realAmox.batch_id}', serial_number: '${realAmox.serial_number}', hash: '${realAmox.hash}' }`);
+  console.log(`Scenario C (Diverted): { batch_id: '${divertedInsulin.batch_id}', serial_number: '${divertedInsulin.serial_number}', hash: '${divertedInsulin.hash}' }`);
+  console.log(`Scenario D (Expired): { batch_id: '${expiredSyrup.batch_id}', serial_number: '${expiredSyrup.serial_number}', hash: '${expiredSyrup.hash}' }`);
+  console.log(`Genuine Paracetamol: { batch_id: '${realPara.batch_id}', serial_number: '${realPara.serial_number}', hash: '${realPara.hash}' }`);
+  console.log(`Genuine Metformin: { batch_id: '${realMetformin.batch_id}', serial_number: '${realMetformin.serial_number}', hash: '${realMetformin.hash}' }`);
+  console.log("\n--- DEMO USERS (password: demo123 for all) ---");
+  console.log("Consumer:     consumer@demo.com");
+  console.log("Pharmacy:     pharmacy@demo.com     | API Key: mg_demo_pharmacy_key_123");
+  console.log("Manufacturer: manufacturer@demo.com  | API Key: mg_demo_manufacturer_key_456");
+  console.log("Regulator:    regulator@demo.com     | API Key: mg_demo_regulator_key_789");
+  console.log("--- END ---\n");
 
   console.log("Seeding complete!");
   process.exit(0);

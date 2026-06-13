@@ -32,16 +32,19 @@ export function generateEventHash(prevHash, eventData) {
  * Verify the integrity of a supply chain (hash chain)
  */
 export function verifyChain(events) {
+  if (!events || events.length === 0) {
+    return { valid: false, brokenAt: 0 };
+  }
   for (let i = 1; i < events.length; i++) {
     const expectedHash = generateEventHash(
-      events[i - 1].eventHash,
+      events[i - 1].event_hash,
       {
-        type: events[i].eventType,
+        type: events[i].event_type,
         location: events[i].location,
         timestamp: events[i].timestamp,
       }
     );
-    if (expectedHash !== events[i].eventHash) {
+    if (expectedHash !== events[i].event_hash) {
       return { valid: false, brokenAt: i };
     }
   }

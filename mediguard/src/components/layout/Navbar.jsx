@@ -24,6 +24,10 @@ export default function Navbar() {
               <Mic className="h-4 w-4" />
               <span className="hidden sm:inline">Voice Verify</span>
             </Link>
+            <Link href="/test" className="text-emerald-400 hover:text-emerald-300 flex items-center gap-2 font-medium transition-colors">
+              <LayoutDashboard className="h-4 w-4" />
+              <span className="hidden sm:inline">Test API</span>
+            </Link>
           </div>
         </div>
       </div>

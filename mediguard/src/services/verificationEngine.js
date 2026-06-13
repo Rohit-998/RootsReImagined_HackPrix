@@ -4,6 +4,8 @@ import ScanLog from '../models/ScanLog.js';
 import SupplyChainEvent from '../models/SupplyChainEvent.js';
 import { verifyHash, verifyChain } from '../lib/crypto.js';
 import connectDB from '../lib/mongodb.js';
+import { generateAIAnalysis } from './aiAnalysis.js';
+import { fireWebhooks } from './webhookService.js';
 
 export async function verifyMedicine(qrData, userLocation) {
   await connectDB();
@@ -23,13 +25,8 @@ export async function verifyMedicine(qrData, userLocation) {
 
   // Layer 2: Crypto Hash Check (25 pts)
   if (medicine) {
-    // For demo purposes, we verify against the stored hash directly or recompute if we stored secret_key
-    // In our model, we stored the hash directly, but we can also recompute using verifyHash
     const expectedHash = medicine.hash;
     const hashValid = expectedHash === hash;
-    
-    // Alternative if using manufacturer secret:
-    // const hashValid = verifyHash(batch_id, serial_number, hash);
 
     results.hashCheck = {
       passed: hashValid,
@@ -42,7 +39,6 @@ export async function verifyMedicine(qrData, userLocation) {
   }
 
   // Layer 3: Scan Frequency Analysis (20 pts)
-  // Find how many times this specific serial has been scanned
   let scanCount = 0;
   if (medicine) {
       scanCount = await ScanLog.countDocuments({ medicine_id: medicine._id });
@@ -63,7 +59,6 @@ export async function verifyMedicine(qrData, userLocation) {
 
   // Layer 4: Geographic Verification (10 pts)
   if (medicine && userLocation) {
-    // Simple demo match logic
     const geoMatch = userLocation.region && medicine.authorized_region.toLowerCase().includes(userLocation.region.toLowerCase());
     results.geoCheck = {
       passed: geoMatch,
@@ -97,19 +92,41 @@ export async function verifyMedicine(qrData, userLocation) {
   // Layer 6: Supply Chain Integrity (5 pts)
   if (medicine) {
     const events = await SupplyChainEvent.find({ medicine_id: medicine._id }).sort({ timestamp: 1 });
-    // Assuming at least 2 events for a "chain"
-    const chainIntact = events.length > 0; // Simplified for demo; would use verifyChain(events)
-    const { valid } = verifyChain(events); // Strict check
+    const { valid } = verifyChain(events);
 
     results.supplyChain = {
-      passed: valid && events.length > 0,
-      score: valid && events.length > 0 ? 5 : 0,
+      passed: valid,
+      score: valid ? 5 : 0,
       eventsCount: events.length,
-      message: valid && events.length > 0 ? "Supply chain complete — all nodes verified" : "Supply chain broken or missing nodes"
+      events: events.map(e => ({
+        type: e.event_type,
+        location: e.location,
+        timestamp: e.timestamp,
+      })),
+      message: valid ? "Supply chain complete — all nodes verified" : "Supply chain broken or missing nodes"
     };
     totalScore += results.supplyChain.score;
   } else {
     results.supplyChain = { passed: false, score: 0, message: "No supply chain data available" };
+  }
+
+  // Layer 7: Batch Recall Check (instant fail override)
+  if (medicine && medicine.recalled) {
+    results.recallCheck = {
+      passed: false,
+      score: 0,
+      recall_reason: medicine.recall_reason || 'No reason provided',
+      recall_date: medicine.recall_date,
+      message: `⚠️ RECALLED: ${medicine.recall_reason || 'This batch has been recalled by the manufacturer'}`
+    };
+    // Force verdict to counterfeit if recalled
+    totalScore = Math.min(totalScore, 30); // Cap score at 30 for recalled medicines
+  } else {
+    results.recallCheck = {
+      passed: true,
+      score: 0, // No points, just a pass/fail gate
+      message: "No active recalls for this batch"
+    };
   }
 
   // Log this scan
@@ -127,15 +144,54 @@ export async function verifyMedicine(qrData, userLocation) {
     console.error("Failed to log scan", error);
   }
 
-  return {
+  // Determine verdict
+  const verdict = medicine?.recalled 
+    ? "counterfeit" 
+    : totalScore >= 80 ? "verified" : totalScore >= 40 ? "suspicious" : "counterfeit";
+
+  // Build base result
+  const verificationResult = {
     medicineInfo: medicine ? {
+      _id: medicine._id,
       name: medicine.name,
       manufacturer: medicine.manufacturer_id?.name,
       batch_id: medicine.batch_id,
-      exp_date: medicine.exp_date
+      serial_number: medicine.serial_number,
+      mfg_date: medicine.mfg_date,
+      exp_date: medicine.exp_date,
+      category: medicine.category,
+      strength: medicine.strength,
+      authorized_region: medicine.authorized_region,
+      recalled: medicine.recalled,
     } : null,
     results,
     totalScore,
-    verdict: totalScore >= 80 ? "verified" : totalScore >= 40 ? "suspicious" : "counterfeit"
+    verdict,
+    qrData: { batch_id, serial_number },
   };
+
+  // Layer 8: AI Analysis (async, non-blocking for score)
+  try {
+    const aiAnalysis = await generateAIAnalysis(verificationResult);
+    verificationResult.aiAnalysis = aiAnalysis;
+  } catch (error) {
+    console.error("AI Analysis failed:", error.message);
+    verificationResult.aiAnalysis = { analysis: "AI analysis unavailable", source: "error" };
+  }
+
+  // Fire webhooks for counterfeit/suspicious results (async, don't block response)
+  if (verdict === 'counterfeit' || verdict === 'suspicious') {
+    fireWebhooks('counterfeit_detected', {
+      medicine_name: medicine?.name || 'Unknown',
+      batch_id,
+      serial_number,
+      score: totalScore,
+      verdict,
+      location: userLocation,
+      region: userLocation?.region || medicine?.authorized_region,
+      timestamp: new Date().toISOString(),
+    }).catch(err => console.error("Webhook fire failed:", err.message));
+  }
+
+  return verificationResult;
 }
