@@ -4,8 +4,8 @@ import { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
   ShieldCheck, ShieldAlert, ShieldX, Calendar, Hash,
-  Building2, Package, GitBranch, Volume2, VolumeX,
-  CheckCircle2, XCircle, ArrowLeft, Loader2
+  Building2, Package, Volume2, VolumeX,
+  ArrowLeft, Loader2, Flag
 } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import StatusBadge from '@/components/ui/StatusBadge';
@@ -35,10 +35,10 @@ export default function ResultsPage() {
   const router  = useRouter();
   const audioEl = useRef(null);    // holds the Audio object
 
-  const [result, setResult]             = useState(null);
-  const [lang, setLang]                 = useState('hi-IN');
-  const [audioState, setAudioState]     = useState('idle');   // idle | loading | ready | playing | error
-  const [audioSrc, setAudioSrc]         = useState(null);
+  const [result, setResult]         = useState(null);
+  const [lang, setLang]             = useState('hi-IN');
+  const [audioState, setAudioState] = useState('idle');
+  const [audioSrc, setAudioSrc]     = useState(null);
 
   // ── Parse URL data ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -282,10 +282,23 @@ export default function ResultsPage() {
       {/* Verdict Banner */}
       <div className={styles.verdictBanner} style={{ background:vc.bg, border:`2px solid ${vc.border}`, color:vc.color }}>
         <VIcon size={48} />
-        <div>
+        <div style={{ flex:1 }}>
           <h2 className={styles.verdictTitle}>{vc.title}</h2>
           <p className={styles.verdictSubtitle} style={{ color:vc.color, opacity:0.85 }}>{vc.sub}</p>
         </div>
+        {verdict !== 'verified' && (
+          <button
+            onClick={() => router.push(`/report?batch_id=${encodeURIComponent(medicineInfo?.batch_id || '')}&verdict=${verdict}&trust_score=${totalScore}`)}
+            style={{
+              display:'flex', alignItems:'center', gap:'8px',
+              padding:'12px 20px', borderRadius:'10px', border:`2px solid ${vc.color}`,
+              background:'rgba(0,0,0,0.2)', color: vc.color,
+              cursor:'pointer', fontWeight:700, fontSize:'0.9rem', whiteSpace:'nowrap',
+            }}
+          >
+            <Flag size={18} /> Report This
+          </button>
+        )}
       </div>
     </div>
   );
