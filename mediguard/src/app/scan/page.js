@@ -128,7 +128,11 @@ export default function ScanPage() {
   };
 
   // ── Start camera ──
+  const cameraStartingRef = useRef(false);
   const startCamera = async () => {
+    // Guard: prevent multiple concurrent getUserMedia calls
+    if (cameraStartingRef.current || streamRef.current) return;
+    cameraStartingRef.current = true;
     setCameraError('');
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -147,10 +151,14 @@ export default function ScanPage() {
       console.error('Camera error:', err);
       if (err.name === 'NotAllowedError' || err.name === 'NotFoundError') {
         setCameraError('Camera access denied or no camera found. Please use the "Upload QR" option below.');
+      } else if (err.name === 'NotReadableError') {
+        setCameraError('Camera is in use by another app. Close other camera apps and try again.');
       } else {
         setCameraError('Could not start the camera. Please use image upload instead.');
       }
       setCameraActive(false);
+    } finally {
+      cameraStartingRef.current = false;
     }
   };
 
@@ -163,7 +171,7 @@ export default function ScanPage() {
   }, []);
 
   useEffect(() => {
-    if (activeTab === 'scan' && !cameraActive && !isVerifying) {
+    if (activeTab === 'scan' && !isVerifying) {
       startCamera();
     } else if (activeTab !== 'scan') {
       stopCamera();
@@ -294,7 +302,7 @@ export default function ScanPage() {
         // 🚀 HACKATHON DEMO MAGIC:
         // If a real-world, physical medicine QR is scanned (like Cyclopam), it won't be JSON.
         // Instead of failing, we gracefully override it to our seeded Cyclopam batch in DB.
-        console.log("Non-JSON QR detected. Engaging live demo override for:", code.data);
+        console.log("Non-JSON QR detected. Engaging live demo override for:", qrText);
         runVerification({
           batch_id: '70454',
           serial_number: 'SN-0001',
