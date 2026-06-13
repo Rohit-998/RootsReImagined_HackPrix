@@ -1,14 +1,13 @@
 import { NextResponse } from 'next/server';
 import twilio from 'twilio';
-import { generateOTP, storeOTP } from '../../../../lib/otpStore.js';
-
-const client = twilio(
-  process.env.TWILIO_ACCOUNT_SID,
-  process.env.TWILIO_AUTH_TOKEN
-);
+import { generateOTP, storeOTP } from '@/lib/otpStore.js';
 
 export async function POST(request) {
   try {
+    const client = twilio(
+      process.env.TWILIO_ACCOUNT_SID,
+      process.env.TWILIO_AUTH_TOKEN
+    );
     const { phone } = await request.json();
 
     if (!phone || !/^\+?[0-9]{10,13}$/.test(phone.replace(/\s/g, ''))) {
