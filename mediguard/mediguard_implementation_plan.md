@@ -395,7 +395,7 @@ MEDIGUARD_SECRET_KEY=mediguard_demo_secret_2026
 > - `MONGODB_URI` — never exposed to the browser; only used in `lib/mongodb.js` and API routes
 > - `MEDIGUARD_SECRET_KEY` — used server-side only for hash computation in the verification engine
 > - **No `NEXT_PUBLIC_` prefix** on sensitive vars — they stay server-side
-> - **Removed:** `SARVAM_API_KEY` (originally `VITE_SARVAM_API_KEY` under Vite) — not in MVP core. Add `SARVAM_API_KEY` (no NEXT_PUBLIC) only when building the bonus Voice page.
+> - **Deferred:** `SARVAM_API_KEY` — not in MVP core. Add server-side only (no `NEXT_PUBLIC_` prefix) when building the bonus Voice page.
 
 ---
 
