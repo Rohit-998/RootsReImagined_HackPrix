@@ -40,6 +40,10 @@ function ResultsPageContent() {
   const [audioState, setAudioState] = useState('idle');
   const [audioSrc, setAudioSrc]     = useState(null);
 
+  // For Drug Info TTS
+  const drugAudioEl = useRef(null);
+  const [drugAudioState, setDrugAudioState] = useState('idle');
+
   // ── Parse URL data ──────────────────────────────────────────────────────
   useEffect(() => {
     const raw = params.get('data');
@@ -115,6 +119,59 @@ function ResultsPageContent() {
       audio.play().then(() => setAudioState('playing')).catch(console.error);
     }
   };
+
+  const playDrugTTS = async () => {
+    if (drugAudioState === 'playing') {
+      drugAudioEl.current?.pause();
+      setDrugAudioState('ready');
+      return;
+    }
+    
+    // If already loaded for current lang, just play
+    if (drugAudioEl.current) {
+      drugAudioEl.current.currentTime = 0;
+      drugAudioEl.current.play().then(() => setDrugAudioState('playing')).catch(console.error);
+      return;
+    }
+
+    setDrugAudioState('loading');
+    const textToRead = `Disclaimer: This is a safe prescription. Please follow your doctor's prescription first. Category: ${result?.medicineInfo?.category || 'N/A'}. Dosage: ${result?.medicineInfo?.dosage || 'Consult your doctor'}. Instructions: ${result?.medicineInfo?.instructions || ''}. Side effects include ${result?.medicineInfo?.side_effects?.join(', ') || 'none specified'}.`;
+    
+    try {
+      const res = await fetch('/api/voice/synthesize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: textToRead, language: lang }),
+      });
+      const { audioBase64 } = await res.json();
+      if (!audioBase64) throw new Error('No audio returned');
+
+      const src = `data:audio/wav;base64,${audioBase64}`;
+      const audio = new Audio(src);
+      drugAudioEl.current = audio;
+
+      audio.addEventListener('ended',  () => setDrugAudioState('ready'));
+      audio.addEventListener('pause',  () => setDrugAudioState('ready'));
+      audio.addEventListener('error',  () => setDrugAudioState('error'));
+      audio.addEventListener('canplaythrough', () => {
+        setDrugAudioState('ready');
+        audio.play().then(() => setDrugAudioState('playing')).catch(() => setDrugAudioState('ready'));
+      }, { once: true });
+      audio.load();
+    } catch (err) {
+      console.error('Drug TTS Error:', err);
+      setDrugAudioState('error');
+    }
+  };
+
+  // Clear drug TTS if language changes so it fetches fresh on next play
+  useEffect(() => {
+    if (drugAudioEl.current) {
+      drugAudioEl.current.pause();
+      drugAudioEl.current = null;
+      setDrugAudioState('idle');
+    }
+  }, [lang]);
 
   // ── Language change ─────────────────────────────────────────────────────
   const handleLangChange = (e) => {
@@ -254,9 +311,30 @@ function ResultsPageContent() {
       {/* Drug Information Card */}
       {medicineInfo && (medicineInfo.category || medicineInfo.instructions || medicineInfo.side_effects?.length > 0) && (
         <Card style={{ marginTop: '1.5rem', background: 'var(--bg-surface)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
-            <Pill size={20} style={{ color: '#7c3aed' }} />
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>Drug Information</h3>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Pill size={20} style={{ color: '#7c3aed' }} />
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>Drug Information</h3>
+            </div>
+            
+            {/* Play Button for Sarvam TTS */}
+            <button 
+              onClick={playDrugTTS}
+              disabled={drugAudioState === 'loading'}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                padding: '6px 12px', borderRadius: '20px',
+                background: drugAudioState === 'playing' ? 'rgba(124, 58, 237, 0.1)' : 'var(--bg-panel)',
+                color: drugAudioState === 'playing' ? '#7c3aed' : 'var(--text-secondary)',
+                border: `1px solid ${drugAudioState === 'playing' ? '#7c3aed' : 'var(--border-color)'}`,
+                cursor: drugAudioState === 'loading' ? 'not-allowed' : 'pointer',
+                fontSize: '0.85rem', fontWeight: 600, transition: 'all 0.2s'
+              }}
+            >
+              {drugAudioState === 'loading' ? <Loader2 size={16} className="animate-spin" /> : 
+               drugAudioState === 'playing' ? <VolumeX size={16} /> : <Volume2 size={16} />}
+              {drugAudioState === 'playing' ? 'Stop' : 'Listen'}
+            </button>
           </div>
           
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
@@ -264,6 +342,13 @@ function ResultsPageContent() {
               <p style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '4px' }}>
                 <Info size={14} /> Usage & Dosage
               </p>
+              
+              <div style={{ padding: '8px 12px', background: 'rgba(16, 185, 129, 0.1)', borderRadius: '6px', borderLeft: '3px solid #10b981', marginBottom: '12px', marginTop: '8px' }}>
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#047857', fontWeight: 600, lineHeight: 1.4 }}>
+                  <ShieldCheck size={14} style={{ display: 'inline', verticalAlign: 'text-bottom', marginRight: '4px' }} />
+                  This is a safe prescription. Please follow your doctor's prescription first.
+                </p>
+              </div>
               <p style={{ fontSize: '0.9rem', color: 'var(--text-primary)', margin: '0 0 6px', lineHeight: 1.5 }}>
                 <span style={{ fontWeight: 600 }}>Category:</span> {medicineInfo.category || 'N/A'} {medicineInfo.strength ? `(${medicineInfo.strength})` : ''}
               </p>

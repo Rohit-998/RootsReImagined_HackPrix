@@ -69,6 +69,7 @@ export default function ScanPage() {
   // ── Stop camera ──
   const stopCamera = useCallback(() => {
     if (scanLoopRef.current) {
+      clearTimeout(scanLoopRef.current);
       cancelAnimationFrame(scanLoopRef.current);
       scanLoopRef.current = null;
     }
@@ -84,30 +85,63 @@ export default function ScanPage() {
 
   // ── Scan loop — reads frames and checks for QR codes ──
   const startScanLoop = useCallback(() => {
-    const scan = () => {
-      if (!videoRef.current || !canvasRef.current || videoRef.current.readyState !== 4) {
-        scanLoopRef.current = requestAnimationFrame(scan);
-        return;
-      }
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
+    let detector = null;
+    if (typeof window !== 'undefined' && 'BarcodeDetector' in window) {
+      try {
+        detector = new window.BarcodeDetector({ formats: ['qr_code'] });
+      } catch (e) { console.warn("BarcodeDetector not supported"); }
+    }
 
-      if (code) {
-        // Found a QR — stop camera and process
-        stopCamera();
-        processQRData(code.data);
+    const scan = async () => {
+      if (!videoRef.current || !canvasRef.current || videoRef.current.readyState !== 4 || !cameraActive) {
+        scanLoopRef.current = setTimeout(scan, 100);
         return;
       }
-      scanLoopRef.current = requestAnimationFrame(scan);
+      
+      const video = videoRef.current;
+      
+      // FAST PATH: Hardware-accelerated Native BarcodeDetector (Android)
+      if (detector) {
+        try {
+          const barcodes = await detector.detect(video);
+          if (barcodes.length > 0) {
+            stopCamera();
+            processQRData(barcodes[0].rawValue);
+            return;
+          }
+        } catch (e) {
+          // Ignore detector errors and fallback below
+        }
+      } 
+      
+      // FALLBACK PATH: jsQR (iOS or unsupported browsers)
+      if (!detector) {
+        const canvas = canvasRef.current;
+        // Massive performance boost: Downscale image to max 400px width before scanning
+        const MAX_WIDTH = 400;
+        const scale = Math.min(MAX_WIDTH / video.videoWidth, 1);
+        canvas.width = video.videoWidth * scale;
+        canvas.height = video.videoHeight * scale;
+        
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        
+        const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
+
+        if (code) {
+          stopCamera();
+          processQRData(code.data);
+          return;
+        }
+      }
+
+      // Throttle CPU: Only check ~3 times a second instead of 60 times a second
+      scanLoopRef.current = setTimeout(scan, 300);
     };
-    scanLoopRef.current = requestAnimationFrame(scan);
-  }, [stopCamera]);
+    
+    scanLoopRef.current = setTimeout(scan, 100);
+  }, [cameraActive]); // Removed stopCamera and processQRData to prevent ReferenceError before initialization
 
   // ── Process decoded QR string ──
   const processQRData = useCallback((rawData) => {
