@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { ShieldAlert, Flag, CheckCircle2, ArrowLeft, Loader2, MapPin, User, FileText, Mic, MessageSquare, AudioLines, StopCircle, Globe } from 'lucide-react';
 import { SUPPORTED_LANGUAGES, REPORT_PROMPTS } from '@/utils/languages';
@@ -17,7 +17,7 @@ function createRecognition(langCode) {
   return r;
 }
 
-export default function ReportPage() {
+function ReportPageContent() {
   const params = useSearchParams();
   const router = useRouter();
   const batchId = params.get('batch_id') || '';
@@ -386,3 +386,11 @@ function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 const labelStyle = { display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.875rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '6px' };
 const inputStyle = { width: '100%', padding: '11px 14px', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' };
+
+export default function ReportPage() {
+  return (
+    <Suspense fallback={<div style={{ textAlign: 'center', marginTop: '4rem' }}><Loader2 size={32} style={{ animation: 'spin 1s linear infinite', margin: '0 auto' }} color="#2563EB" /></div>}>
+      <ReportPageContent />
+    </Suspense>
+  );
+}

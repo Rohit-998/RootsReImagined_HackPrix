@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
   ShieldCheck, ShieldAlert, ShieldX, Calendar, Hash,
@@ -30,7 +30,7 @@ const VERDICT_CONFIG = {
 const grades = ['A+', 'A', 'B', 'C', 'D', 'F'];
 const gradeFromScore = s => s >= 90 ? 'A+' : s >= 80 ? 'A' : s >= 65 ? 'B' : s >= 50 ? 'C' : s >= 40 ? 'D' : 'F';
 
-export default function ResultsPage() {
+function ResultsPageContent() {
   const params  = useSearchParams();
   const router  = useRouter();
   const audioEl = useRef(null);    // holds the Audio object
@@ -301,5 +301,13 @@ export default function ResultsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ResultsPage() {
+  return (
+    <Suspense fallback={<div style={{ textAlign: 'center', marginTop: '4rem' }}><Loader2 size={32} style={{ animation: 'spin 1s linear infinite', margin: '0 auto' }} color="#2563EB" /></div>}>
+      <ResultsPageContent />
+    </Suspense>
   );
 }
