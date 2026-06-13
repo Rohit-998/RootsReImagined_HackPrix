@@ -53,9 +53,15 @@ export async function textToSpeech(text, targetLanguage) {
         'API-Subscription-Key': SARVAM_API_KEY
       },
       body: JSON.stringify({
-        text: text,
+        inputs: [text],
         target_language_code: targetLanguage,
-        speaker: 'anushka'
+        speaker: 'manisha',
+        pitch: 0,
+        pace: 1.05,
+        loudness: 1.5,
+        speech_sample_rate: 8000,
+        enable_preprocessing: true,
+        model: 'bulbul:v2'
       })
     });
 

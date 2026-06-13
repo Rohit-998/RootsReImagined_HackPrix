@@ -1,10 +1,22 @@
 'use client';
 
 import Link from 'next/link';
-import { ShieldCheck, Mic } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { ShieldCheck, Mic, Activity, Clock, Flag, BarChart2 } from 'lucide-react';
 import './Navbar.css';
 
+const NAV_LINKS = [
+  { href: '/scan',        label: 'Scan QR',       icon: ShieldCheck },
+  { href: '/voice',       label: 'Voice',          icon: Mic         },
+  { href: '/demo',        label: 'Live Demo',      icon: Activity    },
+  { href: '/pharmacies',  label: 'Pharmacies',     icon: BarChart2   },
+  { href: '/history',     label: 'History',        icon: Clock       },
+  { href: '/report',      label: '🚩 Report',      icon: Flag, accent: '#ef4444' },
+];
+
 export default function Navbar() {
+  const pathname = usePathname();
+
   return (
     <nav className="navbar">
       <div className="container navbar-container">
@@ -12,12 +24,24 @@ export default function Navbar() {
           <ShieldCheck className="navbar-logo" size={24} />
           <span className="navbar-title">MediGuard</span>
         </Link>
-        
+
         <div className="navbar-links">
-          <Link href="/scan" className="nav-link">Scan QR</Link>
-          <Link href="/voice" className="nav-link">Voice Verify</Link>
-          <Link href="/demo" className="nav-link">Live Demo</Link>
-          <Link href="/report" style={{ color: '#ef4444', fontWeight: 600 }} className="nav-link">🚩 Report</Link>
+          {NAV_LINKS.map(({ href, label, icon: Icon, accent }) => {
+            const active = pathname === href;
+            return (
+              <Link
+                key={href}
+                href={href}
+                className="nav-link"
+                style={{
+                  color: active ? (accent || '#2563EB') : accent || undefined,
+                  fontWeight: active || accent ? 700 : undefined,
+                }}
+              >
+                {label}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </nav>
