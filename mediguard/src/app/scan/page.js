@@ -85,7 +85,7 @@ export default function ScanPage() {
 
     const scan = async () => {
       if (!videoRef.current || !canvasRef.current || videoRef.current.readyState !== 4) {
-        scanLoopRef.current = setTimeout(scan, 150);
+        scanLoopRef.current = setTimeout(scan, 100);
         return;
       }
 
@@ -101,30 +101,34 @@ export default function ScanPage() {
             return;
           }
         } catch (e) { /* ignore */ }
+        // BarcodeDetector tried but found nothing — loop fast
+        scanLoopRef.current = setTimeout(scan, 150);
+        return;
       }
 
-      // FALLBACK PATH: jsQR (iOS / Firefox / unsupported browsers)
-      if (!detector) {
-        const canvas = canvasRef.current;
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+      // FALLBACK PATH: jsQR — downscale to 480px wide for speed
+      const canvas = canvasRef.current;
+      const SCAN_WIDTH = 480;
+      const scale = Math.min(SCAN_WIDTH / video.videoWidth, 1);
+      canvas.width = Math.round(video.videoWidth * scale);
+      canvas.height = Math.round(video.videoHeight * scale);
 
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-        const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' });
-        if (code) {
-          stopCamera();
-          processQRData(code.data);
-          return;
-        }
+      const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
+      if (code) {
+        stopCamera();
+        processQRData(code.data);
+        return;
       }
 
-      scanLoopRef.current = setTimeout(scan, 400);
+      // Scan every 150ms (~7 fps) — fast enough to feel instant
+      scanLoopRef.current = setTimeout(scan, 150);
     };
 
-    scanLoopRef.current = setTimeout(scan, 200);
+    scanLoopRef.current = setTimeout(scan, 100);
   };
 
   // ── Start camera ──
@@ -135,8 +139,14 @@ export default function ScanPage() {
     cameraStartingRef.current = true;
     setCameraError('');
     try {
+      // Request moderate resolution + continuous autofocus for tiny medicine QR codes
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment', width: { ideal: 640 }, height: { ideal: 480 } }
+        video: {
+          facingMode: 'environment',
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          focusMode: { ideal: 'continuous' },
+        }
       });
       streamRef.current = stream;
       if (videoRef.current) {
