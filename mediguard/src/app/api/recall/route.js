@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import connectDB from '../../../lib/mongodb';
-import Medicine from '../../../models/Medicine';
-import Manufacturer from '../../../models/Manufacturer';
-import ScanLog from '../../../models/ScanLog';
-import { fireWebhooks } from '../../../services/webhookService';
+import connectDB from '@/lib/mongodb';
+import Medicine from '@/models/Medicine';
+import Manufacturer from '@/models/Manufacturer';
+import ScanLog from '@/models/ScanLog';
+import { fireWebhooks } from '@/services/webhookService';
 
 // POST /api/recall — Issue a batch recall
 export async function POST(request) {

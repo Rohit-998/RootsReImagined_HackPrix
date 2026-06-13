@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import connectDB from '../../../../lib/mongodb';
-import Medicine from '../../../../models/Medicine';
-import Manufacturer from '../../../../models/Manufacturer';
-import ScanLog from '../../../../models/ScanLog';
+import connectDB from '@/lib/mongodb';
+import Medicine from '@/models/Medicine';
+import Manufacturer from '@/models/Manufacturer';
+import ScanLog from '@/models/ScanLog';
 
 // GET /api/manufacturer/batches — List all batches for a manufacturer
 export async function GET(request) {

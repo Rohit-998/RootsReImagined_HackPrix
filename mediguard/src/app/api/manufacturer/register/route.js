@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import connectDB from '../../../../lib/mongodb';
-import Medicine from '../../../../models/Medicine';
-import Manufacturer from '../../../../models/Manufacturer';
-import { generateHash } from '../../../../lib/crypto';
+import connectDB from '@/lib/mongodb';
+import Medicine from '@/models/Medicine';
+import Manufacturer from '@/models/Manufacturer';
+import { generateHash } from '@/lib/crypto';
 
 // POST /api/manufacturer/register — Register a new medicine batch
 export async function POST(request) {

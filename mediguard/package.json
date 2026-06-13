@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@google/genai": "^2.8.0",
     "dotenv": "^17.4.2",
     "geist": "^1.7.2",
     "jsqr": "^1.4.0",

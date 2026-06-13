@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import connectDB from '../../../../lib/mongodb';
-import DrugInteraction from '../../../../models/DrugInteraction';
-import Medicine from '../../../../models/Medicine';
+import connectDB from '@/lib/mongodb';
+import DrugInteraction from '@/models/DrugInteraction';
+import Medicine from '@/models/Medicine';
 
 // POST /api/interactions/check — Check drug interactions between medicines
 export async function POST(request) {

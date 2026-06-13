@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createReport, getReports, updateReportStatus, getReportStats } from '../../../services/reportGenerator';
+import { createReport, getReports, updateReportStatus, getReportStats } from '@/services/reportGenerator';
 
 // POST /api/report — Generate a counterfeit detection report
 export async function POST(request) {

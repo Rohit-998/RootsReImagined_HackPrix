@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShieldCheck, Mic, Activity, Clock, Flag, BarChart2 } from 'lucide-react';
+import { ShieldCheck, Mic, Activity, Clock, Flag, BarChart2, BarChart3 } from 'lucide-react';
 import './Navbar.css';
 
 const NAV_LINKS = [
@@ -12,6 +12,7 @@ const NAV_LINKS = [
   { href: '/pharmacies',  label: 'Pharmacies',     icon: BarChart2   },
   { href: '/history',     label: 'History',        icon: Clock       },
   { href: '/report',      label: '🚩 Report',      icon: Flag, accent: '#ef4444' },
+  { href: '/admin',       label: '📊 Admin',       icon: BarChart3, accent: '#7c3aed' },
 ];
 
 export default function Navbar() {

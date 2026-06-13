@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import connectDB from '../../../lib/mongodb';
-import Webhook from '../../../models/Webhook';
+import connectDB from '@/lib/mongodb';
+import Webhook from '@/models/Webhook';
 import crypto from 'crypto';
 
 // POST /api/webhooks — Register a new webhook

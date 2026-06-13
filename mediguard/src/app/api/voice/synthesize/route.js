@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { textToSpeech } from '../../../../services/sarvamAI';
+import { textToSpeech } from '@/services/sarvamAI';
 
 export async function POST(request) {
   try {

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import connectDB from '../../../../lib/mongodb';
-import User from '../../../../models/User';
-import { generateToken } from '../../../../middleware/auth';
+import connectDB from '@/lib/mongodb';
+import User from '@/models/User';
+import { generateToken } from '@/middleware/auth';
 
 // POST /api/auth/login — Authenticate user
 export async function POST(request) {

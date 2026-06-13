@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { detectAnomalies } from '../../../services/anomalyDetection';
+import { detectAnomalies } from '@/services/anomalyDetection';
 
 // GET /api/alerts — Run anomaly detection and return active alerts
 export async function GET() {

@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import connectDB from '../../../lib/mongodb.js';
-import ScanLog from '../../../models/ScanLog.js';
-import Report from '../../../models/Report.js';
-import Pharmacy from '../../../models/Pharmacy.js';
+import connectDB from '@/lib/mongodb';
+import ScanLog from '@/models/ScanLog';
+import Report from '@/models/Report';
+import Pharmacy from '@/models/Pharmacy';
 
 export async function GET() {
   try {

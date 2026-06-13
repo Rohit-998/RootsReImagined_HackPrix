@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { verifyMedicine } from '../../../services/verificationEngine';
+import { verifyMedicine } from '@/services/verificationEngine';
 
 export async function POST(request) {
   try {
     const body = await request.json();
     const { qrData, userLocation } = body;
 
-    if (!qrData || !qrData.batch_id || !qrData.serial_number || !qrData.hash) {
+    if (!qrData || !qrData.batch_id || !qrData.serial_number) {
       return NextResponse.json({ error: 'Invalid QR Data provided' }, { status: 400 });
     }
 

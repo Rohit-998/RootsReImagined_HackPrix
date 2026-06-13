@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import connectDB from '../../../../lib/mongodb.js';
-import Report from '../../../../models/Report.js';
-import Pharmacy from '../../../../models/Pharmacy.js';
+import connectDB from '@/lib/mongodb.js';
+import Report from '@/models/Report.js';
+import Pharmacy from '@/models/Pharmacy.js';
 
 export async function POST(request) {
   try {

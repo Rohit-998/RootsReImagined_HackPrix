@@ -5,7 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import {
   ShieldCheck, ShieldAlert, ShieldX, Calendar, Hash,
   Building2, Package, Volume2, VolumeX,
-  ArrowLeft, Loader2, Flag
+  ArrowLeft, Loader2, Flag, Pill, Info, AlertCircle
 } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import StatusBadge from '@/components/ui/StatusBadge';
@@ -251,6 +251,63 @@ function ResultsPageContent() {
         </Card>
       </div>
 
+      {/* Drug Information Card */}
+      {medicineInfo && (medicineInfo.category || medicineInfo.instructions || medicineInfo.side_effects?.length > 0) && (
+        <Card style={{ marginTop: '1.5rem', background: 'var(--bg-surface)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
+            <Pill size={20} style={{ color: '#7c3aed' }} />
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0, color: 'var(--text-primary)' }}>Drug Information</h3>
+          </div>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
+            <div>
+              <p style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '4px' }}>
+                <Info size={14} /> Usage & Dosage
+              </p>
+              <p style={{ fontSize: '0.9rem', color: 'var(--text-primary)', margin: '0 0 6px', lineHeight: 1.5 }}>
+                <span style={{ fontWeight: 600 }}>Category:</span> {medicineInfo.category || 'N/A'} {medicineInfo.strength ? `(${medicineInfo.strength})` : ''}
+              </p>
+              <p style={{ fontSize: '0.9rem', color: 'var(--text-primary)', margin: '0 0 6px', lineHeight: 1.5 }}>
+                <span style={{ fontWeight: 600 }}>Dosage:</span> {medicineInfo.dosage || 'Consult your doctor.'}
+              </p>
+              {medicineInfo.instructions && (
+                <p style={{ fontSize: '0.9rem', color: 'var(--text-primary)', margin: 0, lineHeight: 1.5 }}>
+                  <span style={{ fontWeight: 600 }}>Instructions:</span> {medicineInfo.instructions}
+                </p>
+              )}
+            </div>
+
+            {(medicineInfo.side_effects?.length > 0 || medicineInfo.drug_interactions?.length > 0) && (
+              <div>
+                <p style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '4px' }}>
+                  <AlertCircle size={14} /> Warnings & Side Effects
+                </p>
+                {medicineInfo.side_effects?.length > 0 && (
+                  <div style={{ marginBottom: '8px' }}>
+                    <p style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', margin: '0 0 4px' }}>Common Side Effects:</p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                      {medicineInfo.side_effects.map(effect => (
+                        <span key={effect} style={{ fontSize: '0.8rem', padding: '2px 8px', background: 'rgba(220,38,38,0.1)', color: '#DC2626', borderRadius: '4px' }}>
+                          {effect}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {medicineInfo.drug_interactions?.length > 0 && (
+                  <div>
+                    <p style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-primary)', margin: '0 0 4px' }}>Interacts With:</p>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0 }}>
+                      {medicineInfo.drug_interactions.join(', ')}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </Card>
+      )}
+
       {/* Layer Results */}
       <h3 className={styles.sectionTitle}>Security Layer Analysis</h3>
       <div className={styles.layerGrid}>
@@ -299,6 +356,35 @@ function ResultsPageContent() {
             <Flag size={18} /> Report This
           </button>
         )}
+      </div>
+
+      {/* Share Actions */}
+      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+        <button
+          onClick={() => {
+            const msg = verdict === 'verified'
+              ? `✅ MediGuard: ${medicineInfo?.name || 'Medicine'} (Batch: ${medicineInfo?.batch_id}) is VERIFIED with a score of ${totalScore}/100. Safe to consume!`
+              : `⚠️ MediGuard Alert: ${medicineInfo?.name || 'Medicine'} (Batch: ${medicineInfo?.batch_id}) is ${verdict?.toUpperCase()} — Trust Score: ${totalScore}/100. Do NOT consume! Report at: ${typeof window !== 'undefined' ? window.location.origin : ''}/report`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+          }}
+          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', borderRadius: '10px', border: 'none', background: '#25D366', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: '0.9rem' }}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.116.553 4.104 1.519 5.832L0 24l6.335-1.652C8.07 23.447 9.985 24 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.82 0-3.543-.487-5.024-1.382l-.36-.214-3.742.977.998-3.648-.235-.374C2.702 15.898 2.2 14.005 2.2 12 2.2 6.486 6.486 2.2 12 2.2c5.514 0 9.8 4.286 9.8 9.8 0 5.514-4.286 9.8-9.8 9.8z" fillRule="evenodd"/></svg>
+          Share on WhatsApp
+        </button>
+        <button
+          onClick={() => {
+            if (navigator.share) {
+              navigator.share({ title: 'MediGuard Result', text: `${medicineInfo?.name || 'Medicine'} — ${verdict?.toUpperCase()} (${totalScore}/100)`, url: window.location.href });
+            } else {
+              navigator.clipboard.writeText(window.location.href);
+              alert('Link copied!');
+            }
+          }}
+          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', borderRadius: '10px', border: '1px solid var(--border-color)', background: 'var(--bg-surface)', color: 'var(--text-primary)', fontWeight: 700, cursor: 'pointer', fontSize: '0.9rem' }}
+        >
+          📤 Share Result
+        </button>
       </div>
     </div>
   );
