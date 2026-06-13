@@ -38,8 +38,97 @@ export default function ScanPage() {
   const [cameraActive, setCameraActive] = useState(false);
   const [cameraError, setCameraError] = useState('');
 
+  // ── Stop camera ──
+  const stopCamera = () => {
+    if (scanLoopRef.current) {
+      clearTimeout(scanLoopRef.current);
+      scanLoopRef.current = null;
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(t => t.stop());
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+    setCameraActive(false);
+  };
+
+  // ── Process decoded QR string ──
+  const processQRData = (rawData) => {
+    try {
+      const qrData = JSON.parse(rawData);
+      if (!qrData.batch_id || !qrData.serial_number) {
+        setError('QR code is not a valid MediGuard code.');
+        return;
+      }
+      runVerification(qrData);
+    } catch {
+      // Hackathon Demo Magic: non-JSON QR (real medicine)
+      console.log("Non-JSON QR detected. Engaging live demo override for:", rawData);
+      runVerification({
+        batch_id: '70454',
+        serial_number: 'SN-0001',
+        hash: 'CYC_HASH_VALID_123'
+      });
+    }
+  };
+
+  // ── Scan loop — reads frames and checks for QR codes ──
+  const startScanLoop = () => {
+    let detector = null;
+    if (typeof window !== 'undefined' && 'BarcodeDetector' in window) {
+      try {
+        detector = new window.BarcodeDetector({ formats: ['qr_code'] });
+      } catch (e) { /* not supported */ }
+    }
+
+    const scan = async () => {
+      if (!videoRef.current || !canvasRef.current || videoRef.current.readyState !== 4) {
+        scanLoopRef.current = setTimeout(scan, 150);
+        return;
+      }
+
+      const video = videoRef.current;
+
+      // FAST PATH: Hardware-accelerated Native BarcodeDetector (Android Chrome)
+      if (detector) {
+        try {
+          const barcodes = await detector.detect(video);
+          if (barcodes.length > 0) {
+            stopCamera();
+            processQRData(barcodes[0].rawValue);
+            return;
+          }
+        } catch (e) { /* ignore */ }
+      }
+
+      // FALLBACK PATH: jsQR (iOS / Firefox / unsupported browsers)
+      if (!detector) {
+        const canvas = canvasRef.current;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+        const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' });
+        if (code) {
+          stopCamera();
+          processQRData(code.data);
+          return;
+        }
+      }
+
+      scanLoopRef.current = setTimeout(scan, 400);
+    };
+
+    scanLoopRef.current = setTimeout(scan, 200);
+  };
+
   // ── Start camera ──
-  const startCamera = useCallback(async () => {
+  const startCamera = async () => {
     setCameraError('');
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -48,7 +137,6 @@ export default function ScanPage() {
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        // Catch AbortError specifically if the stream is stopped before play completes
         await videoRef.current.play().catch(e => {
           if (e.name !== 'AbortError') throw e;
         });
@@ -64,108 +152,15 @@ export default function ScanPage() {
       }
       setCameraActive(false);
     }
-  }, []);
+  };
 
-  // ── Stop camera ──
-  const stopCamera = useCallback(() => {
-    if (scanLoopRef.current) {
-      clearTimeout(scanLoopRef.current);
-      cancelAnimationFrame(scanLoopRef.current);
-      scanLoopRef.current = null;
-    }
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(t => t.stop());
-      streamRef.current = null;
-    }
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
-    setCameraActive(false);
-  }, []);
-
-  // ── Scan loop — reads frames and checks for QR codes ──
-  const startScanLoop = useCallback(() => {
-    let detector = null;
-    if (typeof window !== 'undefined' && 'BarcodeDetector' in window) {
-      try {
-        detector = new window.BarcodeDetector({ formats: ['qr_code'] });
-      } catch (e) { console.warn("BarcodeDetector not supported"); }
-    }
-
-    const scan = async () => {
-      if (!videoRef.current || !canvasRef.current || videoRef.current.readyState !== 4) {
-        scanLoopRef.current = setTimeout(scan, 100);
-        return;
-      }
-      
-      const video = videoRef.current;
-      
-      // FAST PATH: Hardware-accelerated Native BarcodeDetector (Android)
-      if (detector) {
-        try {
-          const barcodes = await detector.detect(video);
-          if (barcodes.length > 0) {
-            stopCamera();
-            processQRData(barcodes[0].rawValue);
-            return;
-          }
-        } catch (e) {
-          // Ignore detector errors and fallback below
-        }
-      } 
-      
-      // FALLBACK PATH: jsQR (iOS or unsupported browsers)
-      if (!detector) {
-        const canvas = canvasRef.current;
-        // Removed downscaling so jsQR can see tiny medicine QR codes
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        
-        // Pass inversionAttempts: 'attemptBoth' to help with hard-to-read codes
-        const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' });
-
-        if (code) {
-          stopCamera();
-          processQRData(code.data);
-          return;
-        }
-      }
-
-      // Throttle CPU: Check ~2 times a second
-      scanLoopRef.current = setTimeout(scan, 500);
-    };
-    
-    scanLoopRef.current = setTimeout(scan, 100);
-  }, []); // Removed stopCamera, processQRData, and cameraActive to prevent stale closures and ReferenceErrors
-
-  // ── Process decoded QR string ──
-  const processQRData = useCallback((rawData) => {
-    try {
-      const qrData = JSON.parse(rawData);
-      if (!qrData.batch_id || !qrData.serial_number || !qrData.hash) {
-        setError('QR code is not a valid MediGuard code.');
-        return;
-      }
-      runVerification(qrData);
-    } catch {
-      // Hackathon Demo Magic: non-JSON QR (real medicine)
-      console.log("Non-JSON QR detected. Engaging live demo override for:", rawData);
-      runVerification({
-        batch_id: '70454',
-        serial_number: 'SN-0001',
-        hash: 'CYC_HASH_VALID_123'
-      });
-    }
-  }, []);
-
-  // Clean up camera on unmount or tab switch
+  // Clean up camera on unmount
   useEffect(() => {
-    return () => stopCamera();
-  }, [stopCamera]);
+    return () => {
+      if (scanLoopRef.current) clearTimeout(scanLoopRef.current);
+      if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop());
+    };
+  }, []);
 
   useEffect(() => {
     if (activeTab === 'scan' && !cameraActive && !isVerifying) {
