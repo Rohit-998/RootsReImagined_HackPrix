@@ -117,17 +117,16 @@ export default function ScanPage() {
       // FALLBACK PATH: jsQR (iOS or unsupported browsers)
       if (!detector) {
         const canvas = canvasRef.current;
-        // Massive performance boost: Downscale image to max 400px width before scanning
-        const MAX_WIDTH = 400;
-        const scale = Math.min(MAX_WIDTH / video.videoWidth, 1);
-        canvas.width = video.videoWidth * scale;
-        canvas.height = video.videoHeight * scale;
+        // Removed downscaling so jsQR can see tiny medicine QR codes
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
         
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         
-        const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
+        // Pass inversionAttempts: 'attemptBoth' to help with hard-to-read codes
+        const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' });
 
         if (code) {
           stopCamera();
@@ -136,8 +135,8 @@ export default function ScanPage() {
         }
       }
 
-      // Throttle CPU: Only check ~3 times a second instead of 60 times a second
-      scanLoopRef.current = setTimeout(scan, 300);
+      // Throttle CPU: Check ~2 times a second
+      scanLoopRef.current = setTimeout(scan, 500);
     };
     
     scanLoopRef.current = setTimeout(scan, 100);
@@ -257,23 +256,40 @@ export default function ScanPage() {
 
     const img = new Image();
     const url = URL.createObjectURL(file);
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const code = jsQR(imageData.data, imageData.width, imageData.height);
+    img.onload = async () => {
+      let qrText = null;
+
+      // 1. Try Hardware BarcodeDetector first (Vastly superior for small QR codes in large images)
+      if (typeof window !== 'undefined' && 'BarcodeDetector' in window) {
+        try {
+          const detector = new window.BarcodeDetector({ formats: ['qr_code'] });
+          const barcodes = await detector.detect(img);
+          if (barcodes.length > 0) qrText = barcodes[0].rawValue;
+        } catch (e) { console.warn('Native detector failed on image', e); }
+      }
+
+      // 2. Fallback to jsQR if hardware fails or is unsupported
+      if (!qrText) {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        // attemptBoth significantly improves detection of weirdly scaled/inverted QRs
+        const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' });
+        if (code) qrText = code.data;
+      }
+      
       URL.revokeObjectURL(url);
 
-      if (!code) {
-        setError('No QR code found in this image. Please try another.');
+      if (!qrText) {
+        setError('No QR code found in this image. Please ensure the QR is clear and well-lit.');
         return;
       }
 
       try {
-        const qrData = JSON.parse(code.data);
+        const qrData = JSON.parse(qrText);
         if (!qrData.batch_id || !qrData.serial_number || !qrData.hash) {
           setError('QR code is not a valid MediGuard code.');
           return;
