@@ -4,7 +4,7 @@
 
 | Layer | Technology |
 |---|---|
-| Frontend | Vite + React |
+| Frontend | Next.js + React |
 | Styling | Vanilla CSS (dark theme, glassmorphism) |
 | Database | Supabase |
 | QR Scanning | html5-qrcode |
