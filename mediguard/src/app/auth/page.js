@@ -245,6 +245,7 @@ function AuthContent() {
         </button>
       </p>
     </Card>
+    </>
   );
 }
 
