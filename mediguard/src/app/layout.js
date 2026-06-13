@@ -1,23 +1,31 @@
-import './globals.css'
-import { Inter } from 'next/font/google'
-import Navbar from '../components/layout/Navbar'
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+import Navbar from "@/components/layout/Navbar";
 
-const inter = Inter({ subsets: ['latin'] })
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
 export const metadata = {
-  title: 'MediGuard | Anti-Counterfeit Platform',
-  description: 'Multi-layered medicine verification using QR and AI Voice',
-}
+  title: "MediGuard | Enterprise Medicine Verification",
+  description: "Pharmaceutical authenticity verification platform focused on counterfeit medicine detection.",
+};
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} bg-slate-950 text-slate-50 min-h-screen`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body>
         <Navbar />
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className="main-content">
           {children}
         </main>
       </body>
     </html>
-  )
+  );
 }
