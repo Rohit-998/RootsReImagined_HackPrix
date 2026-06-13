@@ -6,7 +6,7 @@
 |---|---|
 | Frontend | Next.js + React |
 | Styling | Vanilla CSS (dark theme, glassmorphism) |
-| Database | Supabase |
+| Database | MongoDB |
 | QR Scanning | html5-qrcode |
 | QR Generation | qrcode.js (for demo QR codes) |
 | Voice | Sarvam AI API (STT + TTS) |
