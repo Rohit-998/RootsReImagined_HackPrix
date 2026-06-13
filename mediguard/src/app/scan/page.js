@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import jsQR from 'jsqr';
-import { QrCode, Keyboard, History, CheckCircle2, Circle, AlertTriangle, XCircle, Upload, Loader2, Camera, CameraOff } from 'lucide-react';
+import { QrCode, Keyboard, History, CheckCircle2, Circle, AlertTriangle, XCircle, Upload, Loader2, Camera, CameraOff, Crosshair } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import styles from './page.module.css';
@@ -74,7 +74,7 @@ export default function ScanPage() {
     }
   };
 
-  // ── Scan loop — reads frames and checks for QR codes ──
+  // ── Scan loop — reads frames and checks for QR codes (background) ──
   const startScanLoop = () => {
     let detector = null;
     if (typeof window !== 'undefined' && 'BarcodeDetector' in window) {
@@ -85,7 +85,7 @@ export default function ScanPage() {
 
     const scan = async () => {
       if (!videoRef.current || !canvasRef.current || videoRef.current.readyState !== 4) {
-        scanLoopRef.current = setTimeout(scan, 100);
+        scanLoopRef.current = setTimeout(scan, 200);
         return;
       }
 
@@ -101,34 +101,51 @@ export default function ScanPage() {
             return;
           }
         } catch (e) { /* ignore */ }
-        // BarcodeDetector tried but found nothing — loop fast
-        scanLoopRef.current = setTimeout(scan, 150);
-        return;
       }
 
-      // FALLBACK PATH: jsQR — downscale to 480px wide for speed
-      const canvas = canvasRef.current;
-      const SCAN_WIDTH = 480;
-      const scale = Math.min(SCAN_WIDTH / video.videoWidth, 1);
-      canvas.width = Math.round(video.videoWidth * scale);
-      canvas.height = Math.round(video.videoHeight * scale);
-
-      const ctx = canvas.getContext('2d', { willReadFrequently: true });
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-      const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
-      if (code) {
-        stopCamera();
-        processQRData(code.data);
-        return;
-      }
-
-      // Scan every 150ms (~7 fps) — fast enough to feel instant
-      scanLoopRef.current = setTimeout(scan, 150);
+      scanLoopRef.current = setTimeout(scan, 250);
     };
 
-    scanLoopRef.current = setTimeout(scan, 100);
+    scanLoopRef.current = setTimeout(scan, 200);
+  };
+
+  // ── Manual capture: take a single high-res snapshot and scan it ──
+  const captureAndScan = async () => {
+    if (!videoRef.current || !canvasRef.current) return;
+    const video = videoRef.current;
+    if (video.readyState !== 4) return;
+
+    setError('');
+    const canvas = canvasRef.current;
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    let qrText = null;
+
+    // 1. Try BarcodeDetector on the canvas (hardware accelerated)
+    if (typeof window !== 'undefined' && 'BarcodeDetector' in window) {
+      try {
+        const detector = new window.BarcodeDetector({ formats: ['qr_code'] });
+        const barcodes = await detector.detect(canvas);
+        if (barcodes.length > 0) qrText = barcodes[0].rawValue;
+      } catch (e) { /* ignore */ }
+    }
+
+    // 2. Fallback: jsQR at FULL resolution (slow but accurate for tiny QR)
+    if (!qrText) {
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' });
+      if (code) qrText = code.data;
+    }
+
+    if (qrText) {
+      stopCamera();
+      processQRData(qrText);
+    } else {
+      setError('No QR found. Hold the QR code closer and tap Capture again.');
+    }
   };
 
   // ── Start camera ──
@@ -410,40 +427,59 @@ export default function ScanPage() {
                     style={{ display: 'none' }}
                   />
 
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
-                    {!cameraActive ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
+                    {/* Primary action: Capture button (big and prominent) */}
+                    {cameraActive && (
                       <Button
                         variant="primary"
                         className={styles.fullWidthBtn}
-                        onClick={startCamera}
+                        onClick={captureAndScan}
                         disabled={isVerifying}
-                        style={{ flex: 1 }}
+                        style={{ padding: '14px', fontSize: '1rem', fontWeight: 700 }}
                       >
-                        <Camera size={16} /> Open Camera
+                        {isVerifying ? (
+                          <><Loader2 size={18} className="animate-spin" /> Verifying...</>
+                        ) : (
+                          <><Crosshair size={18} /> Capture & Scan</>
+                        )}
                       </Button>
-                    ) : (
+                    )}
+
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      {!cameraActive ? (
+                        <Button
+                          variant="primary"
+                          className={styles.fullWidthBtn}
+                          onClick={startCamera}
+                          disabled={isVerifying}
+                          style={{ flex: 1 }}
+                        >
+                          <Camera size={16} /> Open Camera
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          className={styles.fullWidthBtn}
+                          onClick={stopCamera}
+                          style={{ flex: 1 }}
+                        >
+                          <CameraOff size={16} /> Stop Camera
+                        </Button>
+                      )}
                       <Button
                         variant="outline"
                         className={styles.fullWidthBtn}
-                        onClick={stopCamera}
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isVerifying}
                         style={{ flex: 1 }}
                       >
-                        <CameraOff size={16} /> Stop Camera
+                        {isVerifying ? (
+                          <><Loader2 size={16} className="animate-spin" /> Verifying...</>
+                        ) : (
+                          <><Upload size={16} /> Upload QR</>
+                        )}
                       </Button>
-                    )}
-                    <Button
-                      variant="outline"
-                      className={styles.fullWidthBtn}
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={isVerifying}
-                      style={{ flex: 1 }}
-                    >
-                      {isVerifying ? (
-                        <><Loader2 size={16} className="animate-spin" /> Verifying...</>
-                      ) : (
-                        <><Upload size={16} /> Upload QR</>
-                      )}
-                    </Button>
+                    </div>
                   </div>
 
                   {(error || cameraError) && (
