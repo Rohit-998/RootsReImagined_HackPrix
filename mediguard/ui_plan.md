@@ -1,19 +1,22 @@
 Design and implement a modern healthcare-security web application called MediGuard. This is NOT a consumer wellness app, medicine reminder app, or generic healthcare dashboard. MediGuard is a pharmaceutical authenticity verification platform focused on counterfeit medicine detection. The design language should combine the professionalism of Stripe Dashboard, Linear, Vercel, Cloudflare Zero Trust, Palantir Gotham, and modern enterprise compliance software. Users should immediately feel that they are interacting with a critical verification system used by pharmacies, hospitals, regulators, and manufacturers.
 
-Use a dark enterprise theme. Avoid bright gradients, startup aesthetics, neumorphism, glassmorphism overload, cartoon illustrations, oversized hero graphics, or playful design patterns. Avoid large rounded rectangles and bubble UI. Use border radii between 6px and 8px only. Components should feel structured, dense, and information-focused rather than decorative.
+Use a clean, high-contrast light enterprise theme. Avoid bright gradients, startup aesthetics, neumorphism, glassmorphism overload, cartoon illustrations, oversized hero graphics, or playful design patterns. Avoid large rounded rectangles and bubble UI. Use border radii between 6px and 8px only. Components should feel structured, dense, and information-focused rather than decorative.
 
 Color System:
-- Background: #0B1020
-- Secondary Surface: #12182B
-- Elevated Surface: #171F35
-- Borders: #26314F
-- Primary Accent: #3B82F6
-- Secondary Accent: #60A5FA
-- Warning: #F59E0B
-- Danger: #EF4444
-- Verified State: #38BDF8
+- Background: #F8FAFC
+- Secondary Surface: #FFFFFF
+- Elevated Surface: #FFFFFF
+- Borders: #E2E8F0
+- Text Primary: #0F172A
+- Text Secondary: #475569
+- Text Muted: #94A3B8
+- Primary Accent: #2563EB
+- Secondary Accent: #3B82F6
+- Warning: #D97706
+- Danger: #DC2626
+- Verified State: #0284C7
 
-Do not use green as the primary success color. Verified states should use blue tones to communicate trust and verification rather than celebration.
+Do not use green as the primary success color. Verified states should use blue/sky tones to communicate trust and verification rather than celebration. All text must maintain high contrast ratios against light backgrounds.
 
 Typography:
 - Use Inter, Geist, or IBM Plex Sans.
@@ -21,7 +24,7 @@ Typography:
 - Strong visual hierarchy.
 - Dense but readable enterprise spacing.
 
-Build the application using React, Vite, React Router, Vanilla CSS, and a CSS variable-based design system. Do not use Tailwind. Do not use component libraries. Build reusable custom components.
+Build the application using Next.js (App Router), Vanilla CSS, and a CSS variable-based design system. Do not use Tailwind. Do not use component libraries. Build reusable custom components.
 
 The MVP consists of only four pages:
 

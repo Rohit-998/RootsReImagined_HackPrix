@@ -8,7 +8,7 @@
 | MLH Criterion | How MediGuard Addresses It |
 |---|---|
 | **Technical Implementation** | 6-layer cryptographic verification engine, hash-chain tamper detection, MongoDB Atlas cloud DB |
-| **Design** | Dark glassmorphism UI, animated trust score, step-by-step supply chain timeline |
+| **Design** | Sleek light enterprise UI, animated trust score, step-by-step supply chain timeline |
 | **Completion** | 4 focused pages, no scope creep, every feature directly serves medicine verification |
 | **Real-World Impact** | WHO estimates 1 in 10 medicines in developing countries is fake — this is a live, working solution |
 | **Wow Factor** | Side-by-side demo catches a fake in seconds; animated 6-layer breakdown is visually compelling |
@@ -20,7 +20,7 @@
 | Layer | Technology |
 |---|---|
 | Frontend | Next.js (App Router) |
-| Styling | Vanilla CSS (dark theme, glassmorphism) |
+| Styling | Vanilla CSS (light theme, clean enterprise) |
 | Database | MongoDB Atlas (via Mongoose) |
 | API Layer | Next.js Route Handlers (`app/api/`) |
 | QR Scanning | html5-qrcode |
@@ -337,8 +337,8 @@ Each scenario has a pre-printed QR in `public/demo-qr/` for live demo use.
 ### Person A — Frontend & UI
 | Task | Hours | Priority |
 |---|---|---|
-| Project setup (Vite + React + Router + Supabase client) | 0–1 | 🔴 |
-| Design system (CSS variables, dark theme, glassmorphism) | 1–3 | 🔴 |
+| Project setup (Next.js App Router + MongoDB connection) | 0–1 | 🔴 |
+| Design system (CSS variables, light theme, clean borders) | 1–3 | 🔴 |
 | HomePage (hero, stats, 3-step how-it-works, CTAs) | 3–6 | 🔴 |
 | ScanPage (QR scanner + manual entry tabs) | 6–10 | 🔴 |
 | ResultsPage (trust score circle, layer cards, supply chain) | 10–17 | 🔴 |
@@ -350,13 +350,13 @@ Each scenario has a pre-printed QR in `public/demo-qr/` for live demo use.
 ### Person B — Backend & Verification Engine
 | Task | Hours | Priority |
 |---|---|---|
-| Supabase schema creation | 0–2 | 🔴 |
+| MongoDB collections & schemas creation | 0–2 | 🔴 |
 | Seed script: 3 genuine + 4 counterfeit + supply chains | 2–4 | 🔴 |
 | Verification engine (all 6 layers) | 4–10 | 🔴 |
 | Hash-chain simulation + supply chain validator | 10–14 | 🔴 |
 | QR code generation for all demo medicines | 14–16 | 🔴 |
-| Scan logging to Supabase | 16–18 | 🔴 |
-| Wire frontend ↔ Supabase end-to-end | 18–24 | 🔴 |
+| Scan logging to MongoDB | 16–18 | 🔴 |
+| Wire frontend ↔ MongoDB end-to-end | 18–24 | 🔴 |
 | Integration testing + bug fixes | 24–30 | 🔴 |
 | Demo prep + README | 30–36 | 🔴 |
 
@@ -373,9 +373,9 @@ Each scenario has a pre-printed QR in `public/demo-qr/` for live demo use.
 ## Build Order
 
 ```
-HOUR  0– 2  │ Setup: Vite project, Supabase schema, sample data seeded
+HOUR  0– 2  │ Setup: Next.js project, MongoDB schema, sample data seeded
 HOUR  2– 4  │ Core logic: verification.js + crypto.js unit-tested in isolation
-HOUR  4–10  │ ScanPage + ResultsPage wired to real Supabase data
+HOUR  4–10  │ ScanPage + ResultsPage wired to real MongoDB API routes
 HOUR 10–16  │ HomePage (hero, polish) + DemoPage (split screen)
 HOUR 16–22  │ Supply chain timeline animation + layer card animations
 HOUR 22–24  │ End-to-end: scan a real QR → see full results in browser
@@ -395,7 +395,7 @@ MEDIGUARD_SECRET_KEY=mediguard_demo_secret_2026
 > - `MONGODB_URI` — never exposed to the browser; only used in `lib/mongodb.js` and API routes
 > - `MEDIGUARD_SECRET_KEY` — used server-side only for hash computation in the verification engine
 > - **No `NEXT_PUBLIC_` prefix** on sensitive vars — they stay server-side
-> - **Removed:** `VITE_SARVAM_API_KEY` — not in MVP core. Add `SARVAM_API_KEY` (no NEXT_PUBLIC) only when building the bonus Voice page.
+> - **Removed:** `SARVAM_API_KEY` (originally `VITE_SARVAM_API_KEY` under Vite) — not in MVP core. Add `SARVAM_API_KEY` (no NEXT_PUBLIC) only when building the bonus Voice page.
 
 ---
 
