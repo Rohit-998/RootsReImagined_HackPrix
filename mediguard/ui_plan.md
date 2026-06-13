@@ -1,4 +1,8 @@
+# MediGuard — UI Specification & Design Plan
+> **Active Frontend Branch:** `frontend-v1`
+
 Design and implement a modern healthcare-security web application called MediGuard. This is NOT a consumer wellness app, medicine reminder app, or generic healthcare dashboard. MediGuard is a pharmaceutical authenticity verification platform focused on counterfeit medicine detection. The design language should combine the professionalism of Stripe Dashboard, Linear, Vercel, Cloudflare Zero Trust, Palantir Gotham, and modern enterprise compliance software. Users should immediately feel that they are interacting with a critical verification system used by pharmacies, hospitals, regulators, and manufacturers.
+
 
 Use a clean, high-contrast light enterprise theme. Avoid bright gradients, startup aesthetics, neumorphism, glassmorphism overload, cartoon illustrations, oversized hero graphics, or playful design patterns. Avoid large rounded rectangles and bubble UI. Use border radii between 6px and 8px only. Components should feel structured, dense, and information-focused rather than decorative.
 
