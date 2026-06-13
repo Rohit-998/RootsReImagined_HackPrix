@@ -93,7 +93,7 @@ export default function ScanPage() {
     }
 
     const scan = async () => {
-      if (!videoRef.current || !canvasRef.current || videoRef.current.readyState !== 4 || !cameraActive) {
+      if (!videoRef.current || !canvasRef.current || videoRef.current.readyState !== 4) {
         scanLoopRef.current = setTimeout(scan, 100);
         return;
       }
@@ -141,7 +141,7 @@ export default function ScanPage() {
     };
     
     scanLoopRef.current = setTimeout(scan, 100);
-  }, [cameraActive]); // Removed stopCamera and processQRData to prevent ReferenceError before initialization
+  }, []); // Removed stopCamera, processQRData, and cameraActive to prevent stale closures and ReferenceErrors
 
   // ── Process decoded QR string ──
   const processQRData = useCallback((rawData) => {
