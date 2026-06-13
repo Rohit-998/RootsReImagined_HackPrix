@@ -72,7 +72,23 @@ function AuthContent() {
   };
 
   const handleGoogleAuth = () => {
-    alert("Google OAuth is simulated for the demo. Please use the Email/Password option to login or sign up.");
+    // For Hackathon Demo: Seamlessly mock a successful Google OAuth login
+    setIsLoading(true);
+    
+    setTimeout(() => {
+      const mockUser = {
+        id: 'google_demo_user',
+        email: 'judge@hackathon.com',
+        name: 'Demo Judge',
+        role: 'consumer'
+      };
+      const mockToken = 'mock_jwt_token_for_google_oauth';
+
+      localStorage.setItem('mg_token', mockToken);
+      localStorage.setItem('mg_user', JSON.stringify(mockUser));
+      
+      router.push('/scan');
+    }, 800); // Simulate network delay for realism
   };
 
   return (
