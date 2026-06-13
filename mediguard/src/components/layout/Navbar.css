@@ -17,14 +17,14 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: var(--accent-primary);
+  color: var(--text-primary);
   text-decoration: none;
 }
 
 .navbar-title {
   font-weight: 700;
   font-size: 1.15rem;
-  color: var(--accent-primary);
+  color: var(--text-primary);
 }
 
 .navbar-links {
@@ -51,7 +51,7 @@
 }
 
 .nav-link-active {
-  color: var(--accent-primary);
-  background-color: rgba(91, 70, 255, 0.06);
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
   font-weight: 600;
 }

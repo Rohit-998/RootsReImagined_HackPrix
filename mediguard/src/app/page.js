@@ -1,29 +1,9 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import { ShieldCheck, QrCode, Search, Volume2, ArrowRight } from 'lucide-react';
+import { QrCode, ArrowRight } from 'lucide-react';
 import VerificationWorkflow from '@/components/VerificationWorkflow';
-
-const STEPS = [
-  {
-    num: '01',
-    icon: QrCode,
-    title: 'Scan the QR Code',
-    desc: 'Use your camera to scan the QR code on the medicine package, or enter the batch number manually.',
-  },
-  {
-    num: '02',
-    icon: Search,
-    title: '6-Layer Verification',
-    desc: 'Our engine checks batch records, cryptographic hashes, clone detection, geo-location, and supply chain.',
-  },
-  {
-    num: '03',
-    icon: Volume2,
-    title: 'Get Your Result',
-    desc: 'Receive a clear verdict with a trust score. Results available in 10 Indian languages via voice playback.',
-  },
-];
+import VerificationIntelligence from '@/components/VerificationIntelligence';
 
 export default function Home() {
   const [stats, setStats] = useState(null);
@@ -48,7 +28,7 @@ export default function Home() {
                 href="/scan"
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: '8px',
-                  padding: '12px 24px', background: 'var(--accent-primary)', color: 'white',
+                  padding: '12px 24px', background: 'var(--accent-primary)', color: 'var(--accent-primary-text)',
                   borderRadius: 'var(--radius-md)', fontWeight: 600, fontSize: '0.95rem',
                   textDecoration: 'none', border: '1px solid var(--accent-primary)',
                   transition: 'all 0.2s ease',
@@ -60,9 +40,9 @@ export default function Home() {
                 href="/demo"
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: '8px',
-                  padding: '12px 24px', background: 'var(--bg-surface)', color: 'var(--text-primary)',
+                  padding: '12px 24px', background: 'var(--accent-secondary)', color: 'var(--accent-secondary-text)',
                   borderRadius: 'var(--radius-md)', fontWeight: 600, fontSize: '0.95rem',
-                  textDecoration: 'none', border: '1px solid var(--border-color)',
+                  textDecoration: 'none', border: '1px solid var(--accent-secondary)',
                   transition: 'all 0.2s ease',
                 }}
               >
@@ -70,67 +50,84 @@ export default function Home() {
               </Link>
             </div>
           </div>
-
-          <div style={{
-            display: 'flex', gap: '2rem', marginTop: '2.5rem',
-            flexWrap: 'wrap',
-          }}>
-            {STEPS.map((step, i) => (
-              <div
-                key={step.num}
-                className={`animate-fade-in-up animate-delay-${i + 1}`}
-                style={{
-                  display: 'flex', alignItems: 'flex-start', gap: '1rem',
-                  flex: '1', minWidth: '200px',
-                  opacity: '0', animationFillMode: 'forwards',
-                }}
-              >
-                <div style={{
-                  width: '44px', height: '44px', borderRadius: 'var(--radius-md)',
-                  background: 'var(--accent-primary)', color: 'white',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontWeight: 700, fontSize: '0.85rem', flexShrink: 0,
-                }}>
-                  {step.num}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                    <step.icon size={16} style={{ color: 'var(--accent-primary)' }} />
-                    <h3 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-primary)' }}>{step.title}</h3>
-                  </div>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>{step.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
-      <section className="container" style={{ paddingTop: '2rem', paddingBottom: '2.5rem' }}>
+      <section className="container" style={{ paddingTop: '2rem', paddingBottom: '3.5rem' }}>
         <div style={{
-          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '1rem',
-          background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)',
-          padding: '1.5rem',
+          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem',
+          padding: '1.5rem 0',
         }}>
           {[
-            { label: 'Medicines Verified', value: stats?.totalScans ?? 0 },
-            { label: 'Counterfeits Caught Today', value: stats?.counterfeitsToday ?? 0 },
-            { label: 'Total Counterfeits Detected', value: stats?.totalCounterfeits ?? 0 },
-            { label: 'Pharmacies Monitored', value: stats?.pharmaciesFlagged ?? 0 },
-          ].map(({ label, value }) => (
-            <div key={label} style={{ textAlign: 'center' }}>
-              <p style={{ fontSize: '1.75rem', fontWeight: 700, color: 'var(--accent-primary)', margin: 0, lineHeight: 1.2 }}>
-                {stats ? value.toLocaleString() : '\u2014'}
-              </p>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '4px 0 0' }}>{label}</p>
-            </div>
+            { label: 'Medicines Verified', value: stats ? stats.totalScans : null },
+            { label: 'Counterfeits Caught Today', value: stats ? stats.counterfeitsToday : null },
+            { label: 'Total Counterfeits Detected', value: stats ? stats.totalCounterfeits : null },
+            { label: 'Pharmacies Monitored', value: stats ? stats.pharmaciesFlagged : null },
+          ].map(({ label, value }, idx) => (
+            <CountUpStat key={label} label={label} value={value} delayIdx={(idx % 4) + 1} />
           ))}
         </div>
       </section>
 
-      <section className="container" style={{ paddingTop: '2rem', paddingBottom: '3rem' }}>
-        <VerificationWorkflow />
+      <section style={{ background: 'var(--bg-surface)', borderTop: '1px solid var(--border-color)', borderBottom: '1px solid var(--border-color)' }}>
+        <div className="container" style={{ paddingTop: '4.5rem', paddingBottom: '5rem' }}>
+          <VerificationWorkflow />
+        </div>
       </section>
+
+      <section style={{ background: 'var(--bg-primary)', paddingTop: '5rem', paddingBottom: '2rem' }}>
+        <VerificationIntelligence />
+      </section>
+
+    </div>
+  );
+}
+
+function CountUpStat({ value, label, delayIdx }) {
+  const [count, setCount] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setIsVisible(true);
+        observer.disconnect();
+      }
+    }, { threshold: 0.1 });
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible || value === null || value === undefined) return;
+    const end = value;
+    const duration = 1500;
+    const startTime = performance.now();
+    
+    const animate = (currentTime) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // easeOutExpo
+      const easeOut = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      setCount(Math.floor(easeOut * end));
+      
+      if (progress < 1) requestAnimationFrame(animate);
+      else setCount(end);
+    };
+    requestAnimationFrame(animate);
+  }, [isVisible, value]);
+
+  return (
+    <div 
+      ref={ref} 
+      className={isVisible ? `animate-fade-in animate-delay-${delayIdx}` : ""}
+      style={{ textAlign: 'center', opacity: 0, animationFillMode: 'forwards' }}
+    >
+      <p style={{ fontSize: '3rem', fontWeight: 700, color: 'var(--accent-secondary)', margin: 0, lineHeight: 1.1, letterSpacing: '-0.02em' }}>
+        {value === null || value === undefined ? '\u2014' : count.toLocaleString()}
+      </p>
+      <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', fontWeight: 500, margin: '8px 0 0' }}>{label}</p>
     </div>
   );
 }

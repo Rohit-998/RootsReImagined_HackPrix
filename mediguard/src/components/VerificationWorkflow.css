@@ -42,7 +42,7 @@
 .vw-rail-fill {
   width: 100%;
   height: 100%;
-  background: var(--accent-primary);
+  background: var(--accent-secondary);
   border-radius: 2px;
 }
 
@@ -78,9 +78,9 @@
 }
 
 .vw-node.active {
-  border-color: var(--accent-primary);
-  background: var(--accent-primary);
-  box-shadow: 0 0 0 4px rgba(91, 70, 255, 0.12);
+  border-color: var(--accent-secondary);
+  background: var(--accent-secondary);
+  box-shadow: 0 0 0 4px rgba(91, 70, 255, 0.15);
 }
 
 .vw-card {
@@ -92,13 +92,20 @@
   align-items: flex-start;
   gap: 14px;
   box-shadow: var(--shadow-sm);
-  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .vw-card.active {
   background: var(--bg-surface);
-  border-color: var(--accent-primary);
+  border-color: var(--accent-secondary);
   box-shadow: var(--shadow-md);
+  transform: translateX(4px);
+}
+
+.vw-card:hover {
+  border-color: var(--border-color);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 .vw-card.completed {
@@ -115,14 +122,14 @@
 }
 
 .vw-step-num {
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: var(--accent-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent-secondary);
   letter-spacing: 0.02em;
 }
 
 .vw-step-icon {
-  color: var(--accent-primary);
+  color: var(--accent-secondary);
 }
 
 .vw-card-content {
