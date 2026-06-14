@@ -56,12 +56,23 @@ function ResultsPageContent() {
 
   const fetchAndPrepareAudio = async (verdict, langCode) => {
     setAudioState('loading');
-    if (audioEl.current) { audioEl.current.pause(); audioEl.current = null; }
+
+    // Stop & destroy any currently playing audio
+    if (audioEl.current) {
+      audioEl.current.pause();
+      audioEl.current.src = '';
+      audioEl.current.removeAttribute('src');
+      audioEl.current.load(); // force release
+      audioEl.current = null;
+    }
     setAudioSrc(null);
 
     const text = buildVerdictAudioText(
       verdict, langCode, result?.results || {}, result?.medicineInfo?.name || null
     );
+
+    // Guard against stale responses when language changes rapidly
+    const requestLang = langCode;
 
     try {
       const res = await fetch('/api/voice/synthesize', {
@@ -69,6 +80,10 @@ function ResultsPageContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text, language: langCode }),
       });
+
+      // If language changed while fetching, discard this response
+      if (requestLang !== lang) return;
+
       const { audioBase64 } = await res.json();
       if (!audioBase64) throw new Error('No audio');
 
@@ -83,6 +98,8 @@ function ResultsPageContent() {
       audio.addEventListener('error',  () => setAudioState('error'));
 
       audio.addEventListener('canplaythrough', () => {
+        // Double-check this audio is still the active one before playing
+        if (audioEl.current !== audio) return;
         setAudioState('ready');
         audio.play().then(() => setAudioState('playing')).catch(() => setAudioState('ready'));
       }, { once: true });
