@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback, Suspense } from 'react';
+import { useState, useRef, useCallback, Suspense, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { ShieldAlert, Flag, CheckCircle2, ArrowLeft, Loader2, MapPin, User, FileText, Mic, MessageSquare, AudioLines, StopCircle, Globe } from 'lucide-react';
 import { SUPPORTED_LANGUAGES, REPORT_PROMPTS } from '@/utils/languages';
@@ -28,6 +28,18 @@ function ReportPageContent() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [reportId, setReportId] = useState('');
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+  const langDropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (langDropdownRef.current && !langDropdownRef.current.contains(e.target)) {
+        setLangDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
   const [error, setError] = useState('');
 
   const [activeMode, setActiveMode] = useState('form');
@@ -301,19 +313,58 @@ function ReportPageContent() {
       </div>
 
       {activeMode === 'voice' && voiceState === 'idle' && (
-        <div style={{ marginBottom: '1.5rem', background: 'var(--bg-primary)', padding: '14px 12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '12px', overflow: 'visible' }}>
-          <Globe size={18} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
-          <div style={{ flex: 1, overflow: 'visible' }}>
-            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '6px' }}>Language</label>
-            <select
-              value={selectedLang}
-              onChange={(e) => setSelectedLang(e.target.value)}
-              style={{ width: '100%', border: 'none', background: 'transparent', outline: 'none', fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)', cursor: 'pointer', lineHeight: '1.8', paddingTop: '2px', paddingBottom: '2px' }}
+        <div
+          ref={langDropdownRef}
+          style={{ position: 'relative', marginBottom: '1.5rem', background: 'var(--bg-primary)', padding: '14px 12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'flex-start', gap: '12px' }}
+        >
+          <Globe size={18} style={{ color: 'var(--text-muted)', flexShrink: 0, marginTop: '18px' }} />
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', margin: '0 0 4px 0', lineHeight: 1 }}>Language</p>
+            <button
+              type="button"
+              onClick={() => setLangDropdownOpen(o => !o)}
+              style={{
+                width: '100%', background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+                fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)',
+                textAlign: 'left', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                lineHeight: '1.8',
+              }}
             >
-              {SUPPORTED_LANGUAGES.map(l => (
-                <option key={l.code} value={l.code}>{l.name}</option>
-              ))}
-            </select>
+              <span style={{ lineHeight: '1.8', display: 'inline-block' }}>
+                {SUPPORTED_LANGUAGES.find(l => l.code === selectedLang)?.name}
+              </span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0, opacity: 0.5, transform: langDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+
+            {langDropdownOpen && (
+              <div style={{
+                position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
+                background: 'var(--bg-surface)', border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-lg)',
+                maxHeight: '220px', overflowY: 'auto', marginTop: '4px'
+              }}>
+                {SUPPORTED_LANGUAGES.map(l => (
+                  <button
+                    key={l.code}
+                    type="button"
+                    onClick={() => { setSelectedLang(l.code); setLangDropdownOpen(false); }}
+                    style={{
+                      display: 'block', width: '100%', padding: '10px 14px', textAlign: 'left',
+                      background: l.code === selectedLang ? 'var(--bg-primary)' : 'none',
+                      border: 'none', cursor: 'pointer',
+                      fontSize: '0.9rem', fontWeight: l.code === selectedLang ? 700 : 400,
+                      color: 'var(--text-primary)', lineHeight: '1.8',
+                    }}
+                    onMouseOver={e => e.currentTarget.style.background = 'var(--bg-primary)'}
+                    onMouseOut={e => e.currentTarget.style.background = l.code === selectedLang ? 'var(--bg-primary)' : 'none'}
+                  >
+                    {l.name}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}
