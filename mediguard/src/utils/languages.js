@@ -24,37 +24,37 @@ export function getLanguageForState(stateName) {
 // {reason} will be replaced with the translated reason at runtime
 const TEMPLATES = {
   'hi-IN': {
-    safe:        (name) => `${name ? name + ' — ' : ''}यह दवा बिल्कुल सुरक्षित है। सभी 6 सत्यापन परतें पास हो गई हैं। आप इसे सुरक्षित रूप से खरीद सकते हैं।`,
+    safe:        (name) => `${name ? name + ' — ' : ''}यह दवा बिल्कुल सुरक्षित है। सभी सत्यापन परतें पास हो गई हैं। आप इसे सुरक्षित रूप से खरीद सकते हैं।`,
     suspicious:  (name, reason) => `चेतावनी! ${name ? name + ' — ' : ''}यह दवा संदिग्ध है। कारण: ${reason} कृपया इसे न खरीदें।`,
     counterfeit: (name, reason) => `खतरा! ${name ? name + ' — ' : ''}यह दवा नकली है। कारण: ${reason} इसे तुरंत वापस करें और दुकानदार की सूचना दें।`,
   },
   'ta-IN': {
-    safe:        (name) => `${name ? name + ' — ' : ''}இந்த மருந்து முற்றிலும் பாதுகாப்பானது. 6 சோதனை அடுக்குகளும் தேர்ச்சி பெற்றன. இதை வாங்கலாம்.`,
+    safe:        (name) => `${name ? name + ' — ' : ''}இந்த மருந்து முற்றிலும் பாதுகாப்பானது. அனைத்து சோதனை அடுக்குகளும் தேர்ச்சி பெற்றன. இதை வாங்கலாம்.`,
     suspicious:  (name, reason) => `எச்சரிக்கை! ${name ? name + ' — ' : ''}இந்த மருந்து சந்தேகத்திற்குரியது. காரணம்: ${reason} தயவுசெய்து இதை வாங்காதீர்கள்.`,
     counterfeit: (name, reason) => `ஆபத்து! ${name ? name + ' — ' : ''}இது போலி மருந்து. காரணம்: ${reason} உடனே திரும்பவும்.`,
   },
   'mr-IN': {
-    safe:        (name) => `${name ? name + ' — ' : ''}हे औषध पूर्णपणे सुरक्षित आहे. 6 सत्यापन स्तर उत्तीर्ण झाले. तुम्ही ते विकत घेऊ शकता.`,
+    safe:        (name) => `${name ? name + ' — ' : ''}हे औषध पूर्णपणे सुरक्षित आहे. सर्व सत्यापन स्तर उत्तीर्ण झाले. तुम्ही ते विकत घेऊ शकता.`,
     suspicious:  (name, reason) => `इशारा! ${name ? name + ' — ' : ''}हे औषध संशयास्पद आहे. कारण: ${reason} कृपया हे विकत घेऊ नका.`,
     counterfeit: (name, reason) => `धोका! ${name ? name + ' — ' : ''}हे औषध बनावट आहे. कारण: ${reason} ताबडतोब परत करा.`,
   },
   'bn-IN': {
-    safe:        (name) => `${name ? name + ' — ' : ''}এই ওষুধটি সম্পূর্ণ নিরাপদ। সব 6টি যাচাইকরণ স্তর পাস হয়েছে। আপনি এটি কিনতে পারেন।`,
+    safe:        (name) => `${name ? name + ' — ' : ''}এই ওষুধটি সম্পূর্ণ নিরাপদ। সব যাচাইকরণ স্তর পাস হয়েছে। আপনি এটি কিনতে পারেন।`,
     suspicious:  (name, reason) => `সতর্কতা! ${name ? name + ' — ' : ''}এই ওষুধটি সন্দেহজনক। কারণ: ${reason} এটি কিনবেন না।`,
     counterfeit: (name, reason) => `বিপদ! ${name ? name + ' — ' : ''}এটি নকল ওষুধ। কারণ: ${reason} এখনই ফেরত দিন।`,
   },
   'gu-IN': {
-    safe:        (name) => `${name ? name + ' — ' : ''}આ દવા સંપૂર્ણ સુરક્ષિત છે. 6 ચકાસણી સ્તરો પાસ થઈ ગયા. તમે આ ખરીદી શકો છો.`,
+    safe:        (name) => `${name ? name + ' — ' : ''}આ દવા સંપૂર્ણ સુરક્ષિત છે. બધા ચકાસણી સ્તરો પાસ થઈ ગયા. તમે આ ખરીદી શકો છો.`,
     suspicious:  (name, reason) => `ચેતવણી! ${name ? name + ' — ' : ''}આ દવા શંકાસ્પદ છે. કારણ: ${reason} કૃપા કરીને તેને ખરીદો નહીં.`,
     counterfeit: (name, reason) => `ખતરો! ${name ? name + ' — ' : ''}આ નકલી દવા છે. કારણ: ${reason} તાત્કાલિક પાછી આપો.`,
   },
   'te-IN': {
-    safe:        (name) => `${name ? name + ' — ' : ''}ఈ మందు పూర్తిగా సురక్షితం. 6 ధృవీకరణ పొరలు పాస్ అయ్యాయి. మీరు దీన్ని కొనవచ్చు.`,
+    safe:        (name) => `${name ? name + ' — ' : ''}ఈ మందు పూర్తిగా సురక్షితం. అన్ని ధృవీకరణ పొరలు పాస్ అయ్యాయి. మీరు దీన్ని కొనవచ్చు.`,
     suspicious:  (name, reason) => `హెచ్చరిక! ${name ? name + ' — ' : ''}ఈ మందు అనుమానాస్పదంగా ఉంది. కారణం: ${reason} దయచేసి కొనకండి.`,
     counterfeit: (name, reason) => `ప్రమాదం! ${name ? name + ' — ' : ''}ఇది నకిలీ మందు. కారణం: ${reason} వెంటనే తిరిగి ఇవ్వండి.`,
   },
   'default': {
-    safe:        (name) => `${name ? name + ': ' : ''}Verified. This medicine is genuine and safe to consume. All 6 security layers passed.`,
+    safe:        (name) => `${name ? name + ': ' : ''}Verified. This medicine is genuine and safe to consume. All security layers passed.`,
     suspicious:  (name, reason) => `Warning! ${name ? name + ': ' : ''}This medicine is suspicious. Reason: ${reason} Do not purchase it.`,
     counterfeit: (name, reason) => `Danger! ${name ? name + ': ' : ''}This medicine is counterfeit. Reason: ${reason} Return it immediately and report the pharmacy.`,
   },
