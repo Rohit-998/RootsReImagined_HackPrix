@@ -237,6 +237,23 @@ function ResultsPageContent() {
         </Card>
       </div>
 
+      <div className={styles.verdictBanner} style={{ background: vc.bg, border: `1px solid ${vc.border}`, color: vc.color }}>
+        <VIcon size={36} />
+        <div style={{ flex: 1 }}>
+          <h2 className={styles.verdictTitle}>{vc.title}</h2>
+          <p style={{ opacity: 0.8, fontSize: '0.9rem', margin: 0 }}>{vc.sub}</p>
+        </div>
+        {verdict !== 'verified' && (
+          <button
+            onClick={() => router.push(`/report?batch_id=${encodeURIComponent(medicineInfo?.batch_id || '')}&verdict=${verdict}&trust_score=${totalScore}`)}
+            className={styles.reportBtn}
+            style={{ borderColor: vc.color, color: vc.color }}
+          >
+            <Flag size={16} /> Report This
+          </button>
+        )}
+      </div>
+
       {medicineInfo && (medicineInfo.category || medicineInfo.instructions || medicineInfo.side_effects?.length > 0) && (
         <Card className={styles.drugInfoCard}>
           <div className={styles.drugInfoHeader}>
@@ -334,22 +351,7 @@ function ResultsPageContent() {
         </div>
       )}
 
-      <div className={styles.verdictBanner} style={{ background: vc.bg, border: `1px solid ${vc.border}`, color: vc.color }}>
-        <VIcon size={36} />
-        <div style={{ flex: 1 }}>
-          <h2 className={styles.verdictTitle}>{vc.title}</h2>
-          <p style={{ opacity: 0.8, fontSize: '0.9rem', margin: 0 }}>{vc.sub}</p>
-        </div>
-        {verdict !== 'verified' && (
-          <button
-            onClick={() => router.push(`/report?batch_id=${encodeURIComponent(medicineInfo?.batch_id || '')}&verdict=${verdict}&trust_score=${totalScore}`)}
-            className={styles.reportBtn}
-            style={{ borderColor: vc.color, color: vc.color }}
-          >
-            <Flag size={16} /> Report This
-          </button>
-        )}
-      </div>
+
     </div>
   );
 }
