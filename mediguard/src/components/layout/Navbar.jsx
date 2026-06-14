@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { QrCode, Flag, BarChart2, Activity, X, Menu, LogIn } from 'lucide-react';
+import { QrCode, Flag, BarChart2, Activity, X, Menu, LogIn, LogOut } from 'lucide-react';
 import './Navbar.css';
 
 const NAV_LINKS = [
@@ -18,6 +18,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -26,16 +27,39 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close menu on route change
+  // Auth state check
   useEffect(() => {
-    setMenuOpen(false);
-  }, [pathname]);
+    const checkAuth = () => {
+      const storedUser = localStorage.getItem('mg_user');
+      const storedToken = localStorage.getItem('mg_token');
+      if (storedUser && storedToken) {
+        try { setUser(JSON.parse(storedUser)); } catch { setUser(null); }
+      } else {
+        setUser(null);
+      }
+    };
+    checkAuth();
+    window.addEventListener('storage', checkAuth);
+    const interval = setInterval(checkAuth, 1000);
+    return () => { window.removeEventListener('storage', checkAuth); clearInterval(interval); };
+  }, []);
+
+  // Close menu on route change
+  useEffect(() => { setMenuOpen(false); }, [pathname]);
 
   // Prevent body scroll when menu is open
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
   }, [menuOpen]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('mg_token');
+    localStorage.removeItem('mg_user');
+    setUser(null);
+    setMenuOpen(false);
+    window.location.href = '/login';
+  };
 
   return (
     <>
@@ -66,9 +90,24 @@ export default function Navbar() {
 
           {/* Right: CTA + Burger */}
           <div className="navbar-actions">
-            <Link href="/login" className="navbar-cta-neutral">
-              Login / Sign Up
-            </Link>
+            {user ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
+                  {user.name?.split(' ')[0]}
+                </span>
+                <button
+                  onClick={handleLogout}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center' }}
+                  title="Log Out"
+                >
+                  <LogOut size={20} />
+                </button>
+              </div>
+            ) : (
+              <Link href="/login" className="navbar-cta-neutral">
+                Login / Sign Up
+              </Link>
+            )}
             <button
               className="navbar-burger"
               onClick={() => setMenuOpen(o => !o)}
@@ -119,10 +158,17 @@ export default function Navbar() {
         </nav>
 
         <div className="mobile-drawer-cta">
-          <Link href="/login" className="mobile-cta-btn" onClick={() => setMenuOpen(false)}>
-            <LogIn size={20} />
-            Login / Sign Up
-          </Link>
+          {user ? (
+            <button onClick={handleLogout} className="mobile-cta-btn" style={{ background: 'var(--color-danger)', border: 'none', cursor: 'pointer', color: 'white', width: '100%' }}>
+              <LogOut size={20} />
+              Log Out ({user.name?.split(' ')[0]})
+            </button>
+          ) : (
+            <Link href="/login" className="mobile-cta-btn" onClick={() => setMenuOpen(false)}>
+              <LogIn size={20} />
+              Login / Sign Up
+            </Link>
+          )}
         </div>
       </div>
     </>

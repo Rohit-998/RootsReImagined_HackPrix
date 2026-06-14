@@ -1,6 +1,7 @@
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import ChatBot from "@/components/ChatBot";
 
 export const metadata = {
   title: "MediGuard | Medicine Verification System",
@@ -39,6 +40,24 @@ export default function RootLayout({ children }) {
           {children}
         </main>
         <Footer />
+        <ChatBot />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                if (window.location.hostname === 'localhost') {
+                  navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for(let registration of registrations) { registration.unregister(); }
+                  });
+                } else {
+                  window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js').catch(() => {});
+                  });
+                }
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   );
