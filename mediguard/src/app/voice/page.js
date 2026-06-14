@@ -104,7 +104,7 @@ export default function VoicePage() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Language:</label>
           <select
-            style={{ padding: '6px 10px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', background: 'var(--bg-surface)', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', cursor: 'pointer' }}
+            style={{ padding: '8px 28px 8px 10px', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-sm)', background: 'var(--bg-surface)', color: 'var(--text-primary)', fontSize: '0.85rem', outline: 'none', cursor: 'pointer', lineHeight: '1.6' }}
             value={selectedLang}
             onChange={(e) => setSelectedLang(e.target.value)}
           >
