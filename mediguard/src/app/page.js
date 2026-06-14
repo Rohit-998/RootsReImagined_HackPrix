@@ -6,11 +6,7 @@ import { QrCode, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import VerificationWorkflow from '@/components/VerificationWorkflow';
 import VerificationIntelligence from '@/components/VerificationIntelligence';
-
-import mobileImg from '../../mobile.png';
-import containerImg from '../../container.png';
-import tablet1Img from '../../tablet1.png';
-import tablet2Img from '../../tablet2.png';
+import HeroFrame from '@/components/HeroFrame';
 
 export default function Home() {
   const [stats, setStats] = useState(null);
@@ -50,11 +46,11 @@ export default function Home() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            gap: '4rem',
-            flexWrap: 'wrap'
+            gap: '2rem',
+            flexWrap: 'nowrap'
           }}>
 
-            {/* Left Side: Image Composition — hidden on mobile */}
+            {/* Left Side: Figma Hero */}
             <motion.div 
               className="hero-image-col"
               initial={{ opacity: 0, y: 30 }}
@@ -62,68 +58,14 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.1, ease: 'easeOut' }}
               style={{
               position: 'relative',
-              flex: '1 1 400px',
-              minHeight: '500px',
+              flex: '0 0 50%',
+              maxWidth: '50%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              overflow: 'visible',
             }}>
-
-              {/* Layer 2: mobile (Anchor Stage) */}
-              <motion.div style={{
-                position: 'absolute',
-                zIndex: 4, // Top most Z position
-                width: '100%',
-                maxWidth: '280px',
-                left: 0, right: 0, margin: '0 auto',
-              }}>
-                <Image src={mobileImg} alt="Mobile Phone" style={{ width: '100%', height: 'auto', objectFit: 'contain' }} priority />
-              </motion.div>
-
-              {/* Layer 3: container (Sits inside phone bounds) */}
-              <motion.div style={{
-                position: 'absolute',
-                zIndex: 3, // Below phone
-                bottom: '-7%',
-                width: '60%',
-                maxWidth: '200px',
-                left: 0, right: 0, margin: '0 auto',
-              }}>
-                <Image src={containerImg} alt="Medicine Container" style={{ width: '100%', height: 'auto', objectFit: 'contain' }} />
-              </motion.div>
-
-              {/* Layer 4: tablet1 (Emerges from container) */}
-              <motion.div className="hide-on-mobile" 
-                initial={{ x: 0, y: 20, rotate: 0 }}
-                animate={{ x: -40, y: -90, rotate: -25 }}
-                transition={{ duration: 1.2, delay: 0.4, ease: 'easeOut' }}
-                style={{
-                position: 'absolute',
-                zIndex: 1, // Below container
-                bottom: '25%',
-                left: '35%', // Starts horizontally near container
-                width: '35%',
-                maxWidth: '90px',
-              }}>
-                <Image src={tablet1Img} alt="Tablet 1" style={{ width: '100%', height: 'auto', objectFit: 'contain' }} />
-              </motion.div>
-
-              {/* Layer 5: tablet2 (Emerges from container) */}
-              <motion.div className="hide-on-mobile" 
-                initial={{ x: 0, y: 20, rotate: 0 }}
-                animate={{ x: 40, y: -80, rotate: 30 }}
-                transition={{ duration: 1.2, delay: 0.6, ease: 'easeOut' }}
-                style={{
-                position: 'absolute',
-                zIndex: 2, // Below container
-                bottom: '22%',
-                right: '35%', // Starts horizontally near container
-                width: '30%',
-                maxWidth: '80px',
-              }}>
-                <Image src={tablet2Img} alt="Tablet 2" style={{ width: '100%', height: 'auto', objectFit: 'contain' }} />
-              </motion.div>
-
+              <HeroFrame />
             </motion.div>
 
             {/* Layer 6: Text Content */}
