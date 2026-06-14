@@ -40,7 +40,7 @@ export default function PharmaciesPage() {
               <span style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-muted)', minWidth: '24px' }}>#{i + 1}</span>
               <div style={{ flex: 1 }}>
                 <p style={{ fontWeight: 600, color: 'var(--text-primary)', margin: 0, fontSize: '0.95rem' }}>{p.name}</p>
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '2px 0 0' }}>{p.location || 'Unknown'} | {p.flagged_count || 0} report(s)</p>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '2px 0 0' }}>{p.city || 'Unknown'} | {p.flagged_count || 0} report(s)</p>
               </div>
               <div style={{ textAlign: 'right' }}>
                 <p style={{ fontSize: '1.2rem', fontWeight: 700, color, margin: 0, lineHeight: 1 }}>{p.trust_score}</p>

@@ -88,6 +88,16 @@ const ScanLog = mongoose.models.ScanLog || mongoose.model('ScanLog', scanLogSche
 const DrugInteraction = mongoose.models.DrugInteraction || mongoose.model('DrugInteraction', drugInteractionSchema);
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 
+const pharmacySchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  city: { type: String, required: true },
+  trust_score: { type: Number, default: 100 },
+  total_scans: { type: Number, default: 0 },
+  flagged_count: { type: Number, default: 0 },
+}, { timestamps: true });
+
+const Pharmacy = mongoose.models.Pharmacy || mongoose.model('Pharmacy', pharmacySchema);
+
 function generateHash(batchId, serialNumber) {
   const data = `${batchId}:${serialNumber}:${SECRET_KEY}`;
   return crypto.createHash("sha256").update(data).digest("hex");
@@ -109,7 +119,23 @@ async function seed() {
   await ScanLog.deleteMany({});
   await DrugInteraction.deleteMany({});
   await User.deleteMany({});
+  await Pharmacy.deleteMany({});
   console.log("Cleared existing data.");
+
+  // 0. Seed Pharmacies
+  console.log("Seeding pharmacies...");
+  await Pharmacy.insertMany([
+    { name: 'Apollo Pharmacy',           city: 'Mumbai, Maharashtra',       trust_score: 97, total_scans: 1240, flagged_count: 0 },
+    { name: 'MedPlus Health',            city: 'Hyderabad, Telangana',      trust_score: 94, total_scans: 890,  flagged_count: 1 },
+    { name: 'Netmeds Store',             city: 'Chennai, Tamil Nadu',       trust_score: 91, total_scans: 720,  flagged_count: 0 },
+    { name: 'PharmEasy Outlet',          city: 'Bengaluru, Karnataka',      trust_score: 88, total_scans: 650,  flagged_count: 2 },
+    { name: 'Wellness Forever',          city: 'Pune, Maharashtra',         trust_score: 85, total_scans: 530,  flagged_count: 1 },
+    { name: 'Jan Aushadhi Kendra',       city: 'Delhi, NCR',               trust_score: 82, total_scans: 410,  flagged_count: 3 },
+    { name: 'Guardian Pharmacy',         city: 'Kolkata, West Bengal',      trust_score: 76, total_scans: 380,  flagged_count: 4 },
+    { name: 'LifeCare Medical Store',    city: 'Lucknow, Uttar Pradesh',   trust_score: 62, total_scans: 290,  flagged_count: 8 },
+    { name: 'Singh Medical Hall',        city: 'Jaipur, Rajasthan',        trust_score: 45, total_scans: 180,  flagged_count: 14 },
+    { name: 'Gupta Pharma & Surgical',   city: 'Patna, Bihar',             trust_score: 28, total_scans: 95,   flagged_count: 22 },
+  ]);
 
   // 1. Create Manufacturers
   const sunPharma = await Manufacturer.create({
