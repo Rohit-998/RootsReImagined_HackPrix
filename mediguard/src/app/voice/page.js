@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Mic, MicOff, MapPin, CheckCircle, AlertTriangle, Loader2, Volume2 } from 'lucide-react';
 import { SUPPORTED_LANGUAGES, getLanguageForState } from '../../utils/languages';
 
@@ -10,8 +10,33 @@ export default function VoicePage() {
   const [transcript, setTranscript] = useState('');
   const [status, setStatus] = useState('idle');
   const [audioResultUrl, setAudioResultUrl] = useState(null);
+  const recognitionRef = useRef(null);
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = false;
+        recognitionRef.current.interimResults = false;
+
+        recognitionRef.current.onresult = (event) => {
+          const text = event.results[0][0].transcript;
+          setTranscript(text);
+          processVoiceInput(text);
+        };
+
+        recognitionRef.current.onerror = (event) => {
+          console.error("Speech recognition error", event.error);
+          setStatus('idle');
+          setIsRecording(false);
+        };
+
+        recognitionRef.current.onend = () => {
+          setIsRecording(false);
+        };
+      }
+    }
     if (!navigator.geolocation) {
       setLocation({ loading: false, error: 'Geolocation not supported' });
       return;
@@ -40,46 +65,56 @@ export default function VoicePage() {
     );
   }, []);
 
+  useEffect(() => {
+    if (recognitionRef.current) {
+      recognitionRef.current.lang = selectedLang;
+    }
+  }, [selectedLang]);
+
   const handleRecord = () => {
     if (isRecording) {
+      recognitionRef.current?.stop();
       setIsRecording(false);
-      setStatus('processing');
-      simulateSarvamProcess();
     } else {
-      setIsRecording(true);
+      setTranscript('');
+      setAudioResultUrl(null);
       setStatus('recording');
+      setIsRecording(true);
+      recognitionRef.current?.start();
     }
   };
 
-  const simulateSarvamProcess = () => {
-    setTimeout(() => {
-      setTranscript("Paracetamol 500mg (BATCH-SUN-2024-001)");
+  const processVoiceInput = async (text) => {
+    setStatus('processing');
+    try {
+      // Very basic simulation of verification based on spoken text
+      let replyText = `You said: ${text}. `;
+      if (text.toLowerCase().includes('paracetamol')) {
+         replyText += 'Paracetamol 500mg verified. It is safe to consume.';
+      } else {
+         replyText += 'Medicine not found in our verified database. Please check the batch number.';
+      }
 
-      setTimeout(async () => {
-        setStatus('verified');
-
-        try {
-          const res = await fetch('/api/voice/synthesize', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              text: 'yah davaa bilkul surakshit hai. aap iska sevan kar sakte hain.',
-              language: selectedLang
-            })
-          });
-          const data = await res.json();
-          if (data.audioBase64) {
-            const audioSrc = `data:audio/wav;base64,${data.audioBase64}`;
-            setAudioResultUrl(audioSrc);
-
-            const audio = new Audio(audioSrc);
-            audio.play();
-          }
-        } catch {
-          console.error("TTS failed");
-        }
-      }, 2000);
-    }, 2000);
+      const res = await fetch('/api/voice/synthesize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: replyText,
+          language: selectedLang
+        })
+      });
+      const data = await res.json();
+      setStatus('verified');
+      if (data.audioBase64) {
+        const audioSrc = `data:audio/wav;base64,${data.audioBase64}`;
+        setAudioResultUrl(audioSrc);
+        const audio = new Audio(audioSrc);
+        audio.play();
+      }
+    } catch {
+      console.error("TTS failed");
+      setStatus('verified');
+    }
   };
 
   return (

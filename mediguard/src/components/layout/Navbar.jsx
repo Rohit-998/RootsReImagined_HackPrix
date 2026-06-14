@@ -8,10 +8,11 @@ import { QrCode, Flag, BarChart2, Activity, X, Menu, LogIn, LogOut } from 'lucid
 import './Navbar.css';
 
 const NAV_LINKS = [
-  { href: '/scan',        label: 'Scan Medicine',  icon: QrCode    },
-  { href: '/report',      label: 'Report',          icon: Flag      },
-  { href: '/pharmacies',  label: 'Pharmacies',      icon: BarChart2 },
-  { href: '/demo',        label: 'How It Works',    icon: Activity  },
+  { href: '/scan',         label: 'Scan Medicine',  icon: QrCode    },
+  { href: '/interactions', label: 'Interactions',   icon: Activity  },
+  { href: '/report',       label: 'Report',         icon: Flag      },
+  { href: '/pharmacies',   label: 'Pharmacies',     icon: BarChart2 },
+  { href: '/demo',         label: 'How It Works',   icon: Activity  },
 ];
 
 export default function Navbar() {

@@ -54,6 +54,7 @@ export default function HistoryPage() {
             const { color, Icon } = verdictStyle[item.verdict] || verdictStyle.suspicious;
             return (
               <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1rem 1.25rem', cursor: 'pointer', transition: 'border-color 0.2s', boxShadow: 'var(--shadow-sm)' }}
+                onClick={() => router.push(`/scan?batch=${encodeURIComponent(item.batch)}`)}
                 onMouseEnter={e => e.currentTarget.style.borderColor = color}
                 onMouseLeave={e => e.currentTarget.style.borderColor = 'var(--border-color)'}
               >

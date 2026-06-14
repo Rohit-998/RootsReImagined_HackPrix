@@ -1,6 +1,6 @@
 {
-  "name": "mediguard",
-  "version": "0.1.0",
+  "name": "safedose",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",

@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { ShieldCheck, AlertTriangle, Flag, TrendingUp, Activity, Users, BarChart3, Clock, ChevronRight, RefreshCw } from 'lucide-react';
 
 function AnimCount({ target, dur = 1200 }) {
@@ -23,6 +24,26 @@ export default function AdminPage() {
   const [reports, setReports] = useState([]);
   const [pharmacies, setPharmacies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const userStr = localStorage.getItem('mg_user');
+    if (!userStr) {
+      router.push('/login');
+      return;
+    }
+    try {
+      const user = JSON.parse(userStr);
+      if (user.role !== 'regulator' && user.role !== 'manufacturer') {
+        router.push('/');
+        return;
+      }
+    } catch {
+      router.push('/login');
+      return;
+    }
+    fetchData();
+  }, [router]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -39,7 +60,7 @@ export default function AdminPage() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchData(); }, []);
+  // useEffect(() => { fetchData(); }, []);
 
   const verdictColor = v => v === 'verified' ? 'var(--color-verified)' : v === 'suspicious' ? 'var(--color-warning)' : 'var(--color-danger)';
 

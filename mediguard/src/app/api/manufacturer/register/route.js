@@ -42,7 +42,7 @@ export async function POST(request) {
         name: manufacturer_name,
         country: body.country || 'Unknown',
         verified: false,
-        secret_key: process.env.SAFEDOSE_SECRET_KEY || 'safedose_demo_secret_2024',
+        secret_key: process.env.MEDIGUARD_SECRET_KEY || 'mediguard_demo_secret_2024',
       });
     }
 
