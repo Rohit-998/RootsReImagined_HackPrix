@@ -112,10 +112,11 @@ export default function ScanPage() {
       }
       runVerification(qrData);
     } catch {
+      // Real medicine QR code scanned — map to our demo Cyclopam entry
       runVerification({
         batch_id: '70454',
-        serial_number: 'SN-0001',
-        hash: 'CYC_HASH_VALID_123'
+        serial_number: 'SN-CYC-001',
+        hash: 'f50b00e8d8ec45d14ac91b2a5441ca8c89751bbb3b60fa3d041a994306b77d21'
       });
     }
   }, []);

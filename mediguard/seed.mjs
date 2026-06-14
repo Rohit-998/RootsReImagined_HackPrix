@@ -159,6 +159,13 @@ async function seed() {
     secret_key: SECRET_KEY
   });
 
+  const indoco = await Manufacturer.create({
+    name: "Indoco Remedies",
+    country: "India",
+    verified: true,
+    secret_key: SECRET_KEY
+  });
+
   // 2. Create Genuine Medicines
   const realPara = await Medicine.create({
     name: "Paracetamol 500mg",
@@ -237,6 +244,49 @@ async function seed() {
     alternatives: ["Honey and lemon", "Dextromethorphan syrup", "Guaifenesin syrup"],
     drug_interactions: ["MAO inhibitors", "Sedatives", "Antihistamines"],
   });
+
+  // ★ DEMO MEDICINE — Cyclopam (real medicine for live demo)
+  const realCyclopam = await Medicine.create({
+    name: "Cyclopam (Paracetamol 500mg + Dicyclomine 20mg)",
+    manufacturer_id: indoco._id,
+    batch_id: "70454",
+    serial_number: "SN-CYC-001",
+    hash: generateHash("70454", "SN-CYC-001"),
+    mfg_date: new Date("2025-10-01"),
+    exp_date: new Date("2027-09-30"),
+    is_genuine: true,
+    authorized_region: "India-Maharashtra",
+    category: "antispasmodic",
+    strength: "500mg + 20mg",
+    dosage: "1 tablet 3 times a day, or as directed by physician.",
+    side_effects: ["Dry mouth", "Drowsiness", "Dizziness", "Blurred vision", "Nausea"],
+    instructions: "Take with or after food. Avoid driving or operating machinery. Do not exceed recommended dose.",
+    alternatives: ["Meftal Spas", "Drotin Plus", "Spasmo Proxyvon"],
+    drug_interactions: ["Antihistamines", "MAO inhibitors", "Warfarin", "Alcohol"],
+  });
+
+  // Supply chain for Cyclopam
+  let prevHashCyc = "GENESIS";
+  const cycEvents = [
+    { type: "manufactured", loc: "Indoco Remedies, Goa Plant", time: "2025-10-01T08:00:00Z" },
+    { type: "qa_passed", loc: "Goa QC Lab", time: "2025-10-02T14:00:00Z" },
+    { type: "shipped", loc: "Central Distribution, Mumbai", time: "2025-10-05T10:00:00Z" },
+    { type: "received", loc: "Apollo Pharmacy, Nagpur", time: "2025-10-12T11:30:00Z" }
+  ];
+
+  for (const ev of cycEvents) {
+    const evData = { type: ev.type, location: ev.loc, timestamp: new Date(ev.time) };
+    const eventHash = generateEventHash(prevHashCyc, evData);
+    await SupplyChainEvent.create({
+      medicine_id: realCyclopam._id,
+      event_type: ev.type,
+      location: ev.loc,
+      timestamp: evData.timestamp,
+      prev_hash: prevHashCyc,
+      event_hash: eventHash
+    });
+    prevHashCyc = eventHash;
+  }
 
   // 3. Create Supply Chain for realPara
   let prevHash = "GENESIS";
@@ -458,6 +508,7 @@ async function seed() {
   console.log(`Scenario D (Expired): { batch_id: '${expiredSyrup.batch_id}', serial_number: '${expiredSyrup.serial_number}', hash: '${expiredSyrup.hash}' }`);
   console.log(`Genuine Paracetamol: { batch_id: '${realPara.batch_id}', serial_number: '${realPara.serial_number}', hash: '${realPara.hash}' }`);
   console.log(`Genuine Metformin: { batch_id: '${realMetformin.batch_id}', serial_number: '${realMetformin.serial_number}', hash: '${realMetformin.hash}' }`);
+  console.log(`★ DEMO Cyclopam: { batch_id: '${realCyclopam.batch_id}', serial_number: '${realCyclopam.serial_number}', hash: '${realCyclopam.hash}' }`);
   console.log("\n--- DEMO USERS (password: demo123 for all) ---");
   console.log("Consumer:     consumer@demo.com");
   console.log("Pharmacy:     pharmacy@demo.com     | API Key: mg_demo_pharmacy_key_123");
