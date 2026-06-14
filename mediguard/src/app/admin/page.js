@@ -51,7 +51,7 @@ export default function AdminPage() {
             <BarChart3 size={24} style={{ color: 'var(--accent-primary)' }} />
             Admin Dashboard
           </h1>
-          <p style={{ color: 'var(--text-secondary)', marginTop: '4px', fontSize: '0.9rem' }}>Real-time overview of MediGuard operations</p>
+          <p style={{ color: 'var(--text-secondary)', marginTop: '4px', fontSize: '0.9rem' }}>Real-time overview of SafeDose operations</p>
         </div>
         <button onClick={fetchData} disabled={loading} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)', background: 'var(--bg-surface)', color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem', fontFamily: 'var(--font-sans)' }}>
           <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> Refresh

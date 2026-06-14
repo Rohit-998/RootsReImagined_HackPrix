@@ -40,9 +40,9 @@ export async function fireWebhooks(eventType, payload) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-MediGuard-Event': eventType,
-          'X-MediGuard-Timestamp': new Date().toISOString(),
-          ...(signature && { 'X-MediGuard-Signature': `sha256=${signature}` }),
+          'X-SafeDose-Event': eventType,
+          'X-SafeDose-Timestamp': new Date().toISOString(),
+          ...(signature && { 'X-SafeDose-Signature': `sha256=${signature}` }),
         },
         body: JSON.stringify({
           event: eventType,

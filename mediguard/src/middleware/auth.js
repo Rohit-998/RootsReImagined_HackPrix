@@ -5,7 +5,7 @@ import crypto from 'crypto';
 import User from '../models/User.js';
 import connectDB from '../lib/mongodb.js';
 
-const AUTH_SECRET = process.env.MEDIGUARD_SECRET_KEY || 'mediguard_demo_secret_2024';
+const AUTH_SECRET = process.env.SAFEDOSE_SECRET_KEY || 'safedose_demo_secret_2024';
 
 /**
  * Generate a simple auth token

@@ -73,7 +73,7 @@ export default function Login() {
               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
             </svg>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 400, margin: '0 0 8px', color: '#202124', fontFamily: 'sans-serif' }}>Sign in with Google</h2>
-            <p style={{ fontSize: '1rem', color: '#5f6368', marginBottom: '32px', fontFamily: 'sans-serif' }}>Choose an account to continue to MediGuard</p>
+            <p style={{ fontSize: '1rem', color: '#5f6368', marginBottom: '32px', fontFamily: 'sans-serif' }}>Choose an account to continue to SafeDose</p>
             <div
               onClick={handleGoogleAccountSelect}
               style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '12px 16px', border: '1px solid #dadce0', borderRadius: '24px', cursor: 'pointer', textAlign: 'left', transition: 'background 0.2s' }}

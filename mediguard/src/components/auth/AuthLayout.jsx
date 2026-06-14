@@ -7,7 +7,7 @@ export default function AuthLayout({ children, title, subtitle }) {
       <div className="auth-left">
         <div className="auth-form-wrapper">
           <div className="auth-header">
-            <Image src="/logo.svg" alt="MediGuard Logo" width={48} height={48} priority className="auth-logo" />
+            <Image src="/logo.svg" alt="SafeDose Logo" width={48} height={48} priority className="auth-logo" />
             <h1 className="auth-title">{title}</h1>
             <p className="auth-subtitle">{subtitle}</p>
           </div>

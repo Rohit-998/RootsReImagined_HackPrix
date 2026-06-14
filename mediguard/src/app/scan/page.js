@@ -107,7 +107,7 @@ export default function ScanPage() {
     try {
       const qrData = JSON.parse(rawData);
       if (!qrData.batch_id || !qrData.serial_number || !qrData.hash) {
-        setError('QR code is not a valid MediGuard code.');
+        setError('QR code is not a valid SafeDose code.');
         return;
       }
       runVerification(qrData);
@@ -222,7 +222,7 @@ export default function ScanPage() {
       try {
         const qrData = JSON.parse(code.data);
         if (!qrData.batch_id || !qrData.serial_number || !qrData.hash) {
-          setError('QR code is not a valid MediGuard code.');
+          setError('QR code is not a valid SafeDose code.');
           return;
         }
         runVerification(qrData);

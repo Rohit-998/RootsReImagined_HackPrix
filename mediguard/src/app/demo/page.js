@@ -123,7 +123,7 @@ export default function DemoPage() {
       <div className={styles.pageHeader}>
         <h1 className={styles.title}>Live Verification Demo</h1>
         <p className={styles.subtitle}>
-          See how MediGuard catches counterfeit medicines compared to traditional barcode systems.
+          See how SafeDose catches counterfeit medicines compared to traditional barcode systems.
         </p>
       </div>
 
@@ -160,12 +160,12 @@ export default function DemoPage() {
           </div>
         </div>
 
-        <div className={`${styles.panel} ${styles.mediguardPanel}`}>
+        <div className={`${styles.panel} ${styles.safedosePanel}`}>
           <div className={styles.panelHeader}>
             <ShieldCheck size={18} />
-            <span>MediGuard - 6 Layer Engine</span>
+            <span>SafeDose - 6 Layer Engine</span>
           </div>
-          <div className={styles.mediguardBody}>
+          <div className={styles.safedoseBody}>
             <div className={styles.stepsList}>
               {demoSteps.length === 0 && (
                 <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem 0' }}>

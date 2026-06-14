@@ -63,7 +63,7 @@ function buildAnalysisContext(medicineInfo, results, totalScore, verdict) {
 }
 
 async function callGeminiAPI(context) {
-  const prompt = `You are MediGuard AI, a pharmaceutical verification assistant. Analyze the following medicine verification results and provide:
+  const prompt = `You are SafeDose AI, a pharmaceutical verification assistant. Analyze the following medicine verification results and provide:
 1. A clear, concise analysis (2-3 sentences) explaining the verification outcome in plain language that a non-technical person can understand.
 2. List specific risk factors identified.
 3. A confidence assessment (high/medium/low) for your analysis.

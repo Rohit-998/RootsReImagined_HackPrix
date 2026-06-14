@@ -9,7 +9,7 @@ function ChatBotContent() {
   
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'bot', text: '👋 Hi! I\'m MediGuard AI. Ask me anything about medicines — uses, side effects, dosage, or safety. How can I help?' }
+    { role: 'bot', text: '👋 Hi! I\'m SafeDose AI. Ask me anything about medicines — uses, side effects, dosage, or safety. How can I help?' }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -93,7 +93,7 @@ Instructions: ${m.instructions || 'None'}.`;
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <Bot size={22} color="white" />
               <div>
-                <p style={{ margin: 0, fontWeight: 700, color: 'white', fontSize: '0.95rem' }}>MediGuard AI</p>
+                <p style={{ margin: 0, fontWeight: 700, color: 'white', fontSize: '0.95rem' }}>SafeDose AI</p>
                 <p style={{ margin: 0, fontSize: '0.7rem', color: 'rgba(255,255,255,0.7)' }}>Powered by Gemini</p>
               </div>
             </div>

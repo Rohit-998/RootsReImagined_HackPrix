@@ -67,8 +67,8 @@ export default function Navbar() {
         <div className="navbar-container">
           {/* Left: Brand */}
           <Link href="/" className="navbar-brand">
-            <Image src="/logo.svg" alt="MediGuard Logo" width={40} height={40} priority className="navbar-logo" />
-            <span className="navbar-title">MediGuard</span>
+            <Image src="/logo.svg" alt="SafeDose Logo" width={40} height={40} priority className="navbar-logo" />
+            <span className="navbar-title">SafeDose</span>
           </Link>
 
           {/* Center: Navigation Links (desktop) */}
@@ -131,8 +131,8 @@ export default function Navbar() {
       <div className={`mobile-drawer ${menuOpen ? 'mobile-drawer-open' : ''}`} role="dialog" aria-modal="true" aria-label="Navigation menu">
         <div className="mobile-drawer-header">
           <Link href="/" className="navbar-brand" onClick={() => setMenuOpen(false)}>
-            <Image src="/logo.svg" alt="MediGuard Logo" width={34} height={34} />
-            <span className="navbar-title">MediGuard</span>
+            <Image src="/logo.svg" alt="SafeDose Logo" width={34} height={34} />
+            <span className="navbar-title">SafeDose</span>
           </Link>
           <button className="mobile-close-btn" onClick={() => setMenuOpen(false)} aria-label="Close menu">
             <X size={24} />

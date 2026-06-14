@@ -61,7 +61,7 @@ export default function VerificationWorkflow() {
   return (
     <div ref={sectionRef} className="vw-section">
       <div className="vw-header">
-        <h2 className="vw-heading">How MediGuard Works</h2>
+        <h2 className="vw-heading">How SafeDose Works</h2>
         <p className="vw-subheading">
           Every package is evaluated through multiple verification layers before an
           authenticity assessment is generated.

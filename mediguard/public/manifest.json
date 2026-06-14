@@ -1,6 +1,6 @@
 {
-  "name": "MediGuard — Medicine Verification",
-  "short_name": "MediGuard",
+  "name": "SafeDose — Medicine Verification",
+  "short_name": "SafeDose",
   "description": "Scan, verify, and report counterfeit medicines. Protect your family with 6-layer pharmaceutical authentication.",
   "start_url": "/",
   "display": "standalone",

@@ -22,7 +22,7 @@ export default function Footer() {
             <div className={styles.ctaBannerLeft}>
               <h2 className={styles.ctaHeadline}>Ready to Verify Medicines with Confidence?</h2>
               <p className={styles.ctaSupport}>
-                Verify authenticity, identify counterfeit risks, and make informed decisions using MediGuard's multi-layer verification system.
+                Verify authenticity, identify counterfeit risks, and make informed decisions using SafeDose's multi-layer verification system.
               </p>
               <div className={styles.ctaActions}>
                 <Link href="/scan" className={styles.ctaPrimary}>
@@ -46,11 +46,11 @@ export default function Footer() {
         <div className={`container ${styles.footerContainer}`}>
           <div className={styles.footerBrand}>
             <Link href="/" className={styles.footerLogo}>
-              <Image src="/logo.svg" alt="MediGuard Logo" width={34} height={34} />
-              MediGuard
+              <Image src="/logo.svg" alt="SafeDose Logo" width={34} height={34} />
+              SafeDose
             </Link>
             <p className={styles.footerDesc}>
-              MediGuard helps consumers and pharmacies assess medicine authenticity using batch verification, supply chain validation, duplicate scan detection, and trust assessment.
+              SafeDose helps consumers and pharmacies assess medicine authenticity using batch verification, supply chain validation, duplicate scan detection, and trust assessment.
             </p>
             <span className={styles.footerTrust}>
               Built for pharmaceutical authenticity verification.
@@ -97,9 +97,9 @@ export default function Footer() {
       {/* Footer Bottom Bar */}
       <div className={styles.footerBottom}>
         <div className={`container ${styles.footerBottomContainer}`}>
-          <span>&copy; {new Date().getFullYear()} MediGuard</span>
+          <span>&copy; {new Date().getFullYear()} SafeDose</span>
           <span className={styles.footerBottomCenter}>Built with Next.js and MongoDB</span>
-          <span className={styles.versionBadge}>MediGuard v1.0</span>
+          <span className={styles.versionBadge}>SafeDose v1.0</span>
         </div>
       </div>
     </footer>

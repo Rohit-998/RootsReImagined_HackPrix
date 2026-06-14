@@ -192,7 +192,7 @@ export const REPORT_PROMPTS = {
     retry: 'ଆମେ ଆପଣଙ୍କ ସ୍ୱର ଶୁଣିପାରିଲୁ ନାହିଁ। ଦୟାକରି ପୁଣି କୁହନ୍ତୁ।'
   },
   'default': {
-    welcome: 'Welcome to MediGuard. Please tell me the name of the pharmacy.',
+    welcome: 'Welcome to SafeDose. Please tell me the name of the pharmacy.',
     issue: 'Thank you. What is the issue with the medicine?',
     success: 'Your report has been submitted. We will report the authorities about the incident. Thank you.',
     retry: 'We could not hear you. Please try again.'

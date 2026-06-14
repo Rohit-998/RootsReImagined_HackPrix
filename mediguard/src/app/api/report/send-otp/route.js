@@ -21,7 +21,7 @@ export async function POST(request) {
     storeOTP(normalised, otp);
 
     await client.messages.create({
-      body: `MediGuard: Your OTP to report a counterfeit medicine is ${otp}. Valid for 5 minutes. Do not share this with anyone.`,
+      body: `SafeDose: Your OTP to report a counterfeit medicine is ${otp}. Valid for 5 minutes. Do not share this with anyone.`,
       from: process.env.TWILIO_PHONE_NUMBER,
       to: normalised,
     });

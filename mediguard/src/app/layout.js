@@ -4,7 +4,7 @@ import Footer from "@/components/layout/Footer";
 import ChatBot from "@/components/ChatBot";
 
 export const metadata = {
-  title: "MediGuard | Medicine Verification System",
+  title: "SafeDose | Medicine Verification System",
   description: "Pharmaceutical authenticity verification platform. Verify your medicines in seconds.",
   manifest: "/manifest.json",
   icons: {
@@ -15,7 +15,7 @@ export const metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "MediGuard",
+    title: "SafeDose",
   },
 };
 

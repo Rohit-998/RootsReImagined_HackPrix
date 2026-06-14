@@ -156,13 +156,13 @@
   border-radius: var(--radius-md);
 }
 
-.mediguardPanel .panelHeader {
+.safedosePanel .panelHeader {
   background-color: rgba(30, 58, 95, 0.05);
   color: var(--accent-primary);
   border-bottom-color: rgba(30, 58, 95, 0.1);
 }
 
-.mediguardBody {
+.safedoseBody {
   padding: var(--spacing-xl);
   display: flex;
   flex-direction: column;
@@ -332,8 +332,8 @@
     padding: 1.25rem;
   }
   .legacyBody,
-  .mediguardBody {
-    padding: 1.25rem;
+  .safedoseBody {
+    padding: 1.5rem;
   }
   .runBtn,
   .audioBtn {

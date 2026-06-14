@@ -513,7 +513,7 @@ export default function TestDashboard() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-white">🧪 MediGuard API Test Dashboard</h1>
+        <h1 className="text-3xl font-bold text-white">🧪 SafeDose API Test Dashboard</h1>
         <p className="text-slate-400 mt-1">Test all 13 backend endpoints. Make sure to run <code className="bg-slate-800 px-2 py-0.5 rounded text-blue-400 text-sm">node seed.mjs</code> first.</p>
       </div>
 

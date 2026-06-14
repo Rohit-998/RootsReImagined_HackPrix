@@ -13,7 +13,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Gemini API key not configured' }, { status: 500 });
     }
 
-    const systemPrompt = `You are MediGuard AI — a helpful, friendly pharmaceutical assistant. You help users understand medicines, their uses, side effects, dosage, and safety information.
+    const systemPrompt = `You are SafeDose AI — a helpful, friendly pharmaceutical assistant. You help users understand medicines, their uses, side effects, dosage, and safety information.
 
 Rules:
 - Keep answers concise (2-4 sentences max unless asked for detail)
@@ -46,7 +46,7 @@ ${context ? `\nContext about the medicine being viewed:\n${context}` : ''}`;
       ? "⚠️ Warning: Please consult your doctor before mixing these. Based on general pharmaceutical data, some combinations can be dangerous. What specific medicine combination are you asking about?"
       : isSideEffects
       ? "Common side effects can include nausea, dizziness, or drowsiness depending on the medicine. Always read the instructions on the packaging. Consult your doctor for personalized advice."
-      : "I am MediGuard AI. For this demo, my connection to the Gemini API is temporarily restricted, but normally I would provide detailed pharmaceutical analysis here! Consult your doctor for personalized advice.";
+      : "I am SafeDose AI. For this demo, my connection to the Gemini API is temporarily restricted, but normally I would provide detailed pharmaceutical analysis here! Consult your doctor for personalized advice.";
       
     return NextResponse.json({ reply: mockReply }, { status: 200 });
   }

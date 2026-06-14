@@ -1,6 +1,6 @@
 import crypto from "crypto";
 
-const SECRET_KEY = process.env.MEDIGUARD_SECRET_KEY || "mediguard_demo_secret_2024";
+const SECRET_KEY = process.env.SAFEDOSE_SECRET_KEY || "safedose_demo_secret_2024";
 
 /**
  * Generate a SHA-256 hash for medicine verification

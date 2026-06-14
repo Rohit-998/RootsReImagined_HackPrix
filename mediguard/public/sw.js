@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mediguard-v1';
+const CACHE_NAME = 'safedose-v1';
 const STATIC_ASSETS = [
   '/',
   '/scan',

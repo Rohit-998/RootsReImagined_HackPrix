@@ -32,7 +32,7 @@ export default function VerificationIntelligence() {
           Trust Engine
         </h2>
         <p style={{ fontSize: '1.1rem', color: 'var(--text-secondary)', maxWidth: '800px', lineHeight: 1.6 }}>
-          MediGuard evaluates every package through multiple independent verification layers to identify authenticity signals and counterfeit risk indicators.
+          SafeDose evaluates every package through multiple independent verification layers to identify authenticity signals and counterfeit risk indicators.
         </p>
       </div>
 
