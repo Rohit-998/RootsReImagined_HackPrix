@@ -156,7 +156,13 @@ export default function ScanPage() {
       const pos = await new Promise((res, rej) =>
         navigator.geolocation.getCurrentPosition(res, rej, { timeout: 3000 })
       );
-      userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude, region: 'Maharashtra' };
+      let region = 'Unknown';
+      try {
+        const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json&accept-language=en`);
+        const geoData = await geoRes.json();
+        region = geoData?.address?.state || 'Unknown';
+      } catch {}
+      userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude, region };
     } catch {}
 
     try {
