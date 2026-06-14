@@ -18,7 +18,7 @@
   border: none;
   cursor: pointer;
   margin-bottom: var(--spacing-md);
-  font-size: 0.875rem;
+  font-size: 1.204rem;
   font-weight: 600;
   padding: 0;
   font-family: var(--font-sans);
@@ -37,14 +37,14 @@
 }
 
 .title {
-  font-size: 1.75rem;
+  font-size: 2.406rem;
   font-weight: 700;
   margin-bottom: var(--spacing-xs);
   color: var(--text-primary);
 }
 
 .subtitle {
-  font-size: 0.95rem;
+  font-size: 1.306rem;
   color: var(--text-secondary);
 }
 
@@ -59,7 +59,7 @@
   padding: 8px 12px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
-  font-size: 0.85rem;
+  font-size: 1.169rem;
   color: var(--text-primary);
   background: var(--bg-surface);
   cursor: pointer;
@@ -79,7 +79,7 @@
   border-radius: var(--radius-sm);
   border: 1px solid;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 1.169rem;
   cursor: pointer;
   transition: all 0.15s ease;
   font-family: var(--font-sans);
@@ -114,21 +114,21 @@
 }
 
 .scoreLabel {
-  font-size: 0.85rem;
+  font-size: 1.169rem;
   font-weight: 600;
   color: var(--text-muted);
   margin-bottom: var(--spacing-sm);
 }
 
 .scoreValue {
-  font-size: 3.5rem;
+  font-size: 4.812rem;
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.02em;
 }
 
 .scoreMax {
-  font-size: 1.25rem;
+  font-size: 1.719rem;
   color: var(--text-muted);
   font-weight: 500;
 }
@@ -144,7 +144,7 @@
 
 .grade {
   padding: 4px 12px;
-  font-size: 0.85rem;
+  font-size: 1.169rem;
   font-weight: 700;
   color: var(--text-muted);
   border-radius: 4px;
@@ -155,7 +155,7 @@
 }
 
 .gradeDesc {
-  font-size: 0.85rem;
+  font-size: 1.169rem;
   color: var(--text-secondary);
 }
 
@@ -184,14 +184,14 @@
 }
 
 .infoLabel {
-  font-size: 0.75rem;
+  font-size: 1.031rem;
   color: var(--text-muted);
   margin-bottom: 2px;
 }
 
 .infoValue {
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 1.238rem;
   color: var(--text-primary);
 }
 
@@ -210,7 +210,7 @@
 }
 
 .drugInfoHeader h3 {
-  font-size: 1rem;
+  font-size: 1.375rem;
   font-weight: 600;
 }
 
@@ -224,14 +224,14 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.85rem;
+  font-size: 1.169rem;
   font-weight: 600;
   color: var(--text-muted);
   margin-bottom: 6px;
 }
 
 .drugInfoText {
-  font-size: 0.9rem;
+  font-size: 1.238rem;
   color: var(--text-secondary);
   margin: 0 0 6px;
   line-height: 1.5;
@@ -249,7 +249,7 @@
 }
 
 .sideEffectTag {
-  font-size: 0.8rem;
+  font-size: 1.0rem;
   padding: 3px 8px;
   background: rgba(220, 38, 38, 0.08);
   color: var(--color-danger);
@@ -258,7 +258,7 @@
 }
 
 .sectionTitle {
-  font-size: 1.1rem;
+  font-size: 1.512rem;
   font-weight: 600;
   border-bottom: 1px solid var(--border-color);
   padding-bottom: var(--spacing-sm);
@@ -285,13 +285,13 @@
 }
 
 .layerName {
-  font-size: 0.95rem;
+  font-size: 1.306rem;
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .layerDesc {
-  font-size: 0.85rem;
+  font-size: 1.169rem;
   flex: 1;
   margin-bottom: var(--spacing-md);
   color: var(--text-secondary);
@@ -301,11 +301,11 @@
   display: block;
   margin-top: 4px;
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 1.169rem;
 }
 
 .layerScore {
-  font-size: 0.85rem;
+  font-size: 1.169rem;
   font-weight: 700;
   background: var(--bg-primary);
   padding: 4px 8px;
@@ -364,12 +364,12 @@
 
 .nodeName {
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 1.169rem;
   color: var(--text-primary);
 }
 
 .nodeDate {
-  font-size: 0.8rem;
+  font-size: 1.1rem;
   color: var(--text-secondary);
 }
 
@@ -383,7 +383,7 @@
 }
 
 .verdictTitle {
-  font-size: 1.3rem;
+  font-size: 1.787rem;
   font-weight: 700;
   margin-bottom: 4px;
   color: inherit;
@@ -399,7 +399,7 @@
   background: var(--bg-surface);
   cursor: pointer;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 1.169rem;
   white-space: nowrap;
   font-family: var(--font-sans);
   transition: all 0.15s ease;
@@ -414,7 +414,7 @@
     padding: var(--spacing-lg) var(--spacing-md);
   }
   .title {
-    font-size: 1.4rem;
+    font-size: 1.925rem;
   }
   .headerRow {
     flex-direction: column;
@@ -446,7 +446,7 @@
 
 @media (max-width: 480px) {
   .scoreValue {
-    font-size: 2.75rem;
+    font-size: 3.781rem;
   }
   .infoGrid {
     grid-template-columns: 1fr 1fr;
@@ -456,6 +456,6 @@
     min-width: 380px;
   }
   .verdictTitle {
-    font-size: 1.1rem;
+    font-size: 1.512rem;
   }
 }

@@ -13,7 +13,7 @@
   border: none;
   cursor: pointer;
   margin-bottom: 2.5rem;
-  font-size: 0.95rem;
+  font-size: 1.306rem;
   font-weight: 700;
   font-family: inherit;
   transition: color 0.2s;
@@ -42,7 +42,7 @@
 }
 
 .title {
-  font-size: 2.25rem;
+  font-size: 3.094rem;
   font-weight: 800;
   color: var(--text-primary);
   margin: 0;
@@ -53,7 +53,7 @@
 .subtitle {
   color: var(--text-secondary);
   margin: 8px 0 0;
-  font-size: 1.05rem;
+  font-size: 1.444rem;
   line-height: 1.6;
 }
 
@@ -88,7 +88,7 @@
   justify-content: center;
   align-items: center;
   gap: 10px;
-  font-size: 1.05rem;
+  font-size: 1.444rem;
   font-family: inherit;
   transition: all 0.2s ease;
 }
@@ -108,7 +108,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 0.95rem;
+  font-size: 1.306rem;
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 10px;
@@ -121,7 +121,7 @@
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   color: var(--text-primary);
-  font-size: 1.05rem;
+  font-size: 1.444rem;
   outline: none;
   font-family: inherit;
   transition: all 0.2s ease;
@@ -145,7 +145,7 @@
   background: var(--color-danger);
   color: white;
   font-weight: 700;
-  font-size: 1.05rem;
+  font-size: 1.444rem;
   font-family: inherit;
   cursor: pointer;
   box-shadow: 4px 4px 0px rgba(17, 24, 39, 0.15);
@@ -184,7 +184,7 @@
 }
 
 .voiceTitle {
-  font-size: 1.25rem;
+  font-size: 1.719rem;
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 1.5rem;
@@ -214,7 +214,7 @@
   background: #111827;
   color: white;
   font-weight: 700;
-  font-size: 1.05rem;
+  font-size: 1.444rem;
   font-family: inherit;
   cursor: pointer;
   box-shadow: 4px 4px 0px rgba(17, 24, 39, 0.15);
@@ -238,7 +238,7 @@
   background: transparent;
   color: var(--color-danger);
   font-weight: 700;
-  font-size: 1.05rem;
+  font-size: 1.444rem;
   font-family: inherit;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -268,7 +268,7 @@
   background: #111827;
   color: white;
   font-weight: 700;
-  font-size: 1.05rem;
+  font-size: 1.444rem;
   cursor: pointer;
   box-shadow: 4px 4px 0px rgba(17, 24, 39, 0.15);
   transition: all 0.2s ease;
@@ -285,10 +285,10 @@
     margin: 1.5rem auto;
   }
   .title {
-    font-size: 1.75rem;
+    font-size: 2.406rem;
   }
   .subtitle {
-    font-size: 0.95rem;
+    font-size: 1.306rem;
   }
   .infoPanel {
     flex-direction: column;
@@ -306,23 +306,23 @@
 
 @media (max-width: 480px) {
   .title {
-    font-size: 1.4rem;
+    font-size: 1.925rem;
   }
   .tabs {
     gap: 8px;
   }
   .tab {
-    font-size: 0.9rem;
+    font-size: 1.238rem;
     padding: 14px 10px;
   }
   .submitBtn,
   .startVoiceBtn,
   .cancelBtn {
-    font-size: 0.95rem;
+    font-size: 1.306rem;
     padding: 14px;
   }
   .input {
-    font-size: 0.95rem;
+    font-size: 1.306rem;
     padding: 14px;
   }
 }

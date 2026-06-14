@@ -4,7 +4,7 @@
 }
 
 .title {
-  font-size: 2.75rem;
+  font-size: 3.781rem;
   font-weight: 800;
   margin-bottom: var(--spacing-sm);
   color: var(--text-primary);
@@ -13,7 +13,7 @@
 
 .subtitle {
   color: var(--text-secondary);
-  font-size: 1.15rem;
+  font-size: 1.581rem;
   max-width: 600px;
   margin: 0 auto;
   line-height: 1.6;
@@ -50,7 +50,7 @@
   gap: 12px;
   padding: 1.5rem;
   font-weight: 800;
-  font-size: 1.25rem;
+  font-size: 1.719rem;
   border-bottom: 2px solid var(--border-color);
   color: var(--text-primary);
   letter-spacing: -0.01em;
@@ -97,7 +97,7 @@
 
 .barcodeLabel {
   font-family: var(--font-mono);
-  font-size: 0.95rem;
+  font-size: 1.306rem;
   font-weight: 600;
   color: var(--text-primary);
   margin: 0;
@@ -108,7 +108,7 @@
   align-items: center;
   gap: 8px;
   font-weight: 700;
-  font-size: 1.05rem;
+  font-size: 1.444rem;
   color: var(--color-verified);
 }
 
@@ -130,7 +130,7 @@
 .legacyRow {
   display: flex;
   justify-content: space-between;
-  font-size: 1rem;
+  font-size: 1.375rem;
 }
 
 .legacyRow span:first-child {
@@ -148,7 +148,7 @@
   align-items: center;
   gap: 12px;
   color: var(--color-warning);
-  font-size: 0.95rem;
+  font-size: 1.306rem;
   font-weight: 700;
   padding: 1rem 1.25rem;
   background-color: rgba(217, 119, 6, 0.07);
@@ -158,7 +158,7 @@
 
 .safedosePanel .panelHeader {
   background-color: rgba(30, 58, 95, 0.05);
-  color: var(--accent-primary);
+  color: #111827;
   border-bottom-color: rgba(30, 58, 95, 0.1);
 }
 
@@ -218,12 +218,12 @@
 .stepLabel {
   font-weight: 700;
   flex: 1;
-  font-size: 1.05rem;
+  font-size: 1.444rem;
   color: var(--text-primary);
 }
 
 .stepResult {
-  font-size: 0.75rem;
+  font-size: 1.031rem;
   font-weight: 800;
   letter-spacing: 0.05em;
   padding: 4px 10px;
@@ -249,14 +249,14 @@
 }
 
 .verdictLabel {
-  font-size: 1.25rem;
+  font-size: 1.719rem;
   font-weight: 800;
   margin: 0 0 4px;
   color: inherit;
 }
 
 .verdictSub {
-  font-size: 0.95rem;
+  font-size: 1.306rem;
   font-weight: 600;
   opacity: 0.9;
   margin: 0;
@@ -274,7 +274,7 @@
   border: 1px solid #111827 !important;
   box-shadow: 4px 4px 0px rgba(17, 24, 39, 0.15);
   border-radius: var(--radius-md);
-  font-size: 1.05rem;
+  font-size: 1.444rem;
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
@@ -305,7 +305,7 @@
   color: var(--color-danger);
   cursor: pointer;
   font-weight: 700;
-  font-size: 1.05rem;
+  font-size: 1.444rem;
   font-family: inherit;
   transition: all 0.2s ease;
 }
@@ -318,17 +318,17 @@
     padding: 2rem 0 1.5rem;
   }
   .title {
-    font-size: 2rem;
+    font-size: 2.75rem;
   }
   .subtitle {
-    font-size: 1rem;
+    font-size: 1.375rem;
   }
   .splitLayout {
     gap: 1.5rem;
     padding-bottom: 3rem;
   }
   .panelHeader {
-    font-size: 1.05rem;
+    font-size: 1.444rem;
     padding: 1.25rem;
   }
   .legacyBody,
@@ -338,13 +338,13 @@
   .runBtn,
   .audioBtn {
     padding: 14px 16px;
-    font-size: 0.95rem;
+    font-size: 1.306rem;
   }
 }
 
 @media (max-width: 480px) {
   .title {
-    font-size: 1.65rem;
+    font-size: 2.269rem;
   }
   .verdictBox {
     flex-direction: column;
@@ -352,7 +352,7 @@
     gap: 12px;
   }
   .stepLabel {
-    font-size: 0.95rem;
+    font-size: 1.306rem;
   }
   .barcodeLines {
     height: 60px;
