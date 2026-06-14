@@ -1,6 +1,6 @@
-# SafeDose 🛡️
+# SafeDos
 
-🔗 **Live Demo**: [https://safedose-rootsreimagined.vercel.app](https://safedose-rootsreimagined.vercel.app/)
+**Live Demo**: [https://safedose-rootsreimagined.vercel.app](https://safedose-rootsreimagined.vercel.app/)
 
 **SafeDose** is a next-generation pharmaceutical authenticity verification platform built for the MLH Hackathon. It leverages a 6-layer verification engine, cryptographic hashing, and AI-powered voice interfaces to detect and report counterfeit medicines.
 
