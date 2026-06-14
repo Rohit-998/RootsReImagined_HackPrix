@@ -301,14 +301,14 @@ function ReportPageContent() {
       </div>
 
       {activeMode === 'voice' && voiceState === 'idle' && (
-        <div style={{ marginBottom: '1.5rem', background: 'var(--bg-primary)', padding: '12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <Globe size={18} style={{ color: 'var(--text-muted)' }} />
-          <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '4px' }}>Language</label>
+        <div style={{ marginBottom: '1.5rem', background: 'var(--bg-primary)', padding: '14px 12px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', display: 'flex', alignItems: 'center', gap: '12px', overflow: 'visible' }}>
+          <Globe size={18} style={{ color: 'var(--text-muted)', flexShrink: 0 }} />
+          <div style={{ flex: 1, overflow: 'visible' }}>
+            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '6px' }}>Language</label>
             <select
               value={selectedLang}
               onChange={(e) => setSelectedLang(e.target.value)}
-              style={{ width: '100%', border: 'none', background: 'transparent', outline: 'none', fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)', cursor: 'pointer' }}
+              style={{ width: '100%', border: 'none', background: 'transparent', outline: 'none', fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)', cursor: 'pointer', lineHeight: '1.8', paddingTop: '2px', paddingBottom: '2px' }}
             >
               {SUPPORTED_LANGUAGES.map(l => (
                 <option key={l.code} value={l.code}>{l.name}</option>
