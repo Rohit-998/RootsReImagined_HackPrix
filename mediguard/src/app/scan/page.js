@@ -136,7 +136,7 @@ export default function ScanPage() {
     runVerification({
       batch_id: '70454',
       serial_number: 'SN-CYC-001',
-      hash: 'f50b00e8d8ec45d14ac91b2a5441ca8c89751bbb3b60fa3d041a994306b77d21'
+      hash: '7e2be4dbbce0186f1906de6976fce0bb466455501f52080dd0712f29e2d24ac6'
     });
   }, []);
 
@@ -219,17 +219,46 @@ export default function ScanPage() {
     const img = new Image();
     const url = URL.createObjectURL(file);
     img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
-      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-      const code = jsQR(imageData.data, imageData.width, imageData.height);
       URL.revokeObjectURL(url);
 
+      // Try QR detection at multiple scales — small QR codes in large photos often fail
+      const scales = [1, 0.5];
+      // Also try a fixed small size
+      const tryWidths = [img.width, Math.min(img.width, 800), Math.min(img.width, 1200)];
+
+      let code = null;
+
+      for (const w of tryWidths) {
+        if (code) break;
+        const scale = w / img.width;
+        const cw = Math.round(img.width * scale);
+        const ch = Math.round(img.height * scale);
+        const canvas = document.createElement('canvas');
+        canvas.width = cw;
+        canvas.height = ch;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, cw, ch);
+        const imageData = ctx.getImageData(0, 0, cw, ch);
+        code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' });
+      }
+
       if (!code) {
-        setError('No QR code found in this image. Please try another.');
+        // Last resort: try with contrast boost
+        const canvas = document.createElement('canvas');
+        const cw = Math.min(img.width, 600);
+        const ch = Math.round(img.height * (cw / img.width));
+        canvas.width = cw;
+        canvas.height = ch;
+        const ctx = canvas.getContext('2d');
+        ctx.filter = 'contrast(1.5) brightness(1.1)';
+        ctx.drawImage(img, 0, 0, cw, ch);
+        ctx.filter = 'none';
+        const imageData = ctx.getImageData(0, 0, cw, ch);
+        code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'attemptBoth' });
+      }
+
+      if (!code) {
+        setError('No QR code found in this image. Try a clearer photo or hold the camera closer to the QR code.');
         return;
       }
 
@@ -241,11 +270,8 @@ export default function ScanPage() {
         }
         runVerification(qrData);
       } catch {
-        runVerification({
-          batch_id: '70454',
-          serial_number: 'SN-0001',
-          hash: 'CYC_HASH_VALID_123'
-        });
+        // Non-SafeDose QR — treat as Cyclopam demo
+        processQRData(code.data);
       }
     };
     img.onerror = () => setError('Could not load the image.');
