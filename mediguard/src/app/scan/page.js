@@ -37,6 +37,25 @@ export default function ScanPage() {
   const [recentScans, setRecentScans] = useState([]);
   const [cameraActive, setCameraActive] = useState(false);
   const [cameraError, setCameraError] = useState('');
+  const locationRef = useRef({});
+
+  // Pre-fetch location on page load so scanning is instant
+  useEffect(() => {
+    (async () => {
+      try {
+        const pos = await new Promise((res, rej) =>
+          navigator.geolocation.getCurrentPosition(res, rej, { timeout: 5000 })
+        );
+        let region = 'Unknown';
+        try {
+          const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json&accept-language=en`);
+          const geoData = await geoRes.json();
+          region = geoData?.address?.state || 'Unknown';
+        } catch {}
+        locationRef.current = { lat: pos.coords.latitude, lng: pos.coords.longitude, region };
+      } catch {}
+    })();
+  }, []);
 
   const startCamera = useCallback(async () => {
     setCameraError('');
@@ -151,19 +170,7 @@ export default function ScanPage() {
     setError('');
     setVerificationSteps(STEP_IDS.map(id => ({ id, label: STEP_LABELS[id], status: 'pending' })));
 
-    let userLocation = {};
-    try {
-      const pos = await new Promise((res, rej) =>
-        navigator.geolocation.getCurrentPosition(res, rej, { timeout: 3000 })
-      );
-      let region = 'Unknown';
-      try {
-        const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json&accept-language=en`);
-        const geoData = await geoRes.json();
-        region = geoData?.address?.state || 'Unknown';
-      } catch {}
-      userLocation = { lat: pos.coords.latitude, lng: pos.coords.longitude, region };
-    } catch {}
+    const userLocation = locationRef.current;
 
     try {
       const res = await fetch('/api/verify', {
