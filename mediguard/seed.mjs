@@ -255,7 +255,7 @@ async function seed() {
     mfg_date: new Date("2025-10-01"),
     exp_date: new Date("2027-09-30"),
     is_genuine: true,
-    authorized_region: "India-Telangana",
+    authorized_region: "India-Maharashtra",
     category: "antispasmodic",
     strength: "500mg + 20mg",
     dosage: "1 tablet 3 times a day, or as directed by physician.",
