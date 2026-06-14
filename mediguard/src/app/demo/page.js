@@ -123,7 +123,7 @@ export default function DemoPage() {
       <div className={styles.pageHeader}>
         <h1 className={styles.title}>Live Verification Demo</h1>
         <p className={styles.subtitle}>
-          See how SafeDose catches counterfeit medicines compared to traditional barcode systems.
+          See how SafeDose catches counterfeit medicines compared to traditional QR code systems.
         </p>
       </div>
 
@@ -131,15 +131,11 @@ export default function DemoPage() {
         <div className={`${styles.panel} ${styles.legacyPanel}`}>
           <div className={styles.panelHeader}>
             <QrCode size={18} />
-            <span>Current System</span>
+            <span>Current System (Basic QR Scan)</span>
           </div>
           <div className={styles.legacyBody}>
-            <div className={styles.barcodeBox}>
-              <div className={styles.barcodeLines}>
-                {BARCODE_WIDTHS.map((w, i) => (
-                  <div key={i} className={styles.barcodeLine} style={{ width: `${w}px` }} />
-                ))}
-              </div>
+            <div className={styles.barcodeBox} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', padding: '1rem' }}>
+              <QrCode size={64} style={{ color: 'var(--text-primary)' }} />
               <p className={styles.barcodeLabel}>BATCH-CIP-2024-015</p>
             </div>
 
