@@ -123,21 +123,21 @@ export default function ScanPage() {
   }, [stopCamera]);
 
   const processQRData = useCallback((rawData) => {
+    // Try to parse as SafeDose JSON format
     try {
       const qrData = JSON.parse(rawData);
-      if (!qrData.batch_id || !qrData.serial_number || !qrData.hash) {
-        setError('QR code is not a valid SafeDose code.');
+      if (qrData.batch_id && qrData.serial_number && qrData.hash) {
+        runVerification(qrData);
         return;
       }
-      runVerification(qrData);
-    } catch {
-      // Real medicine QR code scanned — map to our demo Cyclopam entry
-      runVerification({
-        batch_id: '70454',
-        serial_number: 'SN-CYC-001',
-        hash: 'f50b00e8d8ec45d14ac91b2a5441ca8c89751bbb3b60fa3d041a994306b77d21'
-      });
-    }
+    } catch {}
+
+    // Any non-SafeDose QR code (real medicine, URL, plain text) → map to demo Cyclopam
+    runVerification({
+      batch_id: '70454',
+      serial_number: 'SN-CYC-001',
+      hash: 'f50b00e8d8ec45d14ac91b2a5441ca8c89751bbb3b60fa3d041a994306b77d21'
+    });
   }, []);
 
   useEffect(() => {
