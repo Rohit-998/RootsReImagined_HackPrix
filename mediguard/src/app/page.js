@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { QrCode, ArrowRight } from 'lucide-react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import VerificationWorkflow from '@/components/VerificationWorkflow';
 import VerificationIntelligence from '@/components/VerificationIntelligence';
 
@@ -19,29 +19,7 @@ export default function Home() {
     fetch('/api/stats').then(r => r.json()).then(setStats).catch(() => { });
   }, []);
 
-  // Set up scroll tracking for the entire page
-  const { scrollY } = useScroll();
 
-  // Scroll mapping to match the narrative timeline (0 to 600px of scroll)
-  // The phone acts as the anchor stage, moving very slowly
-  const phoneY = useTransform(scrollY, [0, 600], [0, -20]);
-
-  // The container sits inside the phone area, moving slightly faster
-  const containerY = useTransform(scrollY, [0, 600], [0, -40]);
-
-  // Tablets start near container (low/hidden) and rise rapidly through phone and exit
-  // tablet1 emerges towards top-left
-  const tablet1Y = useTransform(scrollY, [0, 600], [40, -180]);
-  const tablet1X = useTransform(scrollY, [0, 600], [10, -30]);
-  const tablet1Rotate = useTransform(scrollY, [0, 600], [0, -15]);
-
-  // tablet2 emerges towards top-right
-  const tablet2Y = useTransform(scrollY, [0, 600], [60, -150]);
-  const tablet2X = useTransform(scrollY, [0, 600], [-10, 40]);
-  const tablet2Rotate = useTransform(scrollY, [0, 600], [0, 20]);
-
-  // Text content lags subtly to feel premium and readable
-  const textY = useTransform(scrollY, [0, 600], [0, -10]);
 
   return (
     <div>
@@ -98,7 +76,6 @@ export default function Home() {
                 width: '100%',
                 maxWidth: '280px',
                 left: 0, right: 0, margin: '0 auto',
-                y: phoneY
               }}>
                 <Image src={mobileImg} alt="Mobile Phone" style={{ width: '100%', height: 'auto', objectFit: 'contain' }} priority />
               </motion.div>
@@ -111,37 +88,38 @@ export default function Home() {
                 width: '60%',
                 maxWidth: '200px',
                 left: 0, right: 0, margin: '0 auto',
-                y: containerY
               }}>
                 <Image src={containerImg} alt="Medicine Container" style={{ width: '100%', height: 'auto', objectFit: 'contain' }} />
               </motion.div>
 
               {/* Layer 4: tablet1 (Emerges from container) */}
-              <motion.div className="hide-on-mobile" style={{
+              <motion.div className="hide-on-mobile" 
+                initial={{ x: 0, y: 20, rotate: 0 }}
+                animate={{ x: -40, y: -90, rotate: -25 }}
+                transition={{ duration: 1.2, delay: 0.4, ease: 'easeOut' }}
+                style={{
                 position: 'absolute',
                 zIndex: 1, // Below container
                 bottom: '25%',
                 left: '35%', // Starts horizontally near container
                 width: '35%',
                 maxWidth: '90px',
-                y: tablet1Y,
-                x: tablet1X,
-                rotate: tablet1Rotate
               }}>
                 <Image src={tablet1Img} alt="Tablet 1" style={{ width: '100%', height: 'auto', objectFit: 'contain' }} />
               </motion.div>
 
               {/* Layer 5: tablet2 (Emerges from container) */}
-              <motion.div className="hide-on-mobile" style={{
+              <motion.div className="hide-on-mobile" 
+                initial={{ x: 0, y: 20, rotate: 0 }}
+                animate={{ x: 40, y: -80, rotate: 30 }}
+                transition={{ duration: 1.2, delay: 0.6, ease: 'easeOut' }}
+                style={{
                 position: 'absolute',
                 zIndex: 2, // Below container
                 bottom: '22%',
                 right: '35%', // Starts horizontally near container
                 width: '30%',
                 maxWidth: '80px',
-                y: tablet2Y,
-                x: tablet2X,
-                rotate: tablet2Rotate
               }}>
                 <Image src={tablet2Img} alt="Tablet 2" style={{ width: '100%', height: 'auto', objectFit: 'contain' }} />
               </motion.div>
@@ -158,7 +136,6 @@ export default function Home() {
               flex: '1 1 500px',
               position: 'relative',
               zIndex: 5,
-              y: textY
             }}>
               <h1 style={{
                 fontSize: 'clamp(3rem, 6.5vw, 4.75rem)',
