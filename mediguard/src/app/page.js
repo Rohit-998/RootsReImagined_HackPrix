@@ -1,225 +1,316 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import { ShieldCheck, Mic, ArrowRight, Globe, Database, TrendingUp, AlertTriangle, Activity, Search, Pill, Siren } from 'lucide-react';
+import Image from 'next/image';
+import { QrCode, ArrowRight } from 'lucide-react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import VerificationWorkflow from '@/components/VerificationWorkflow';
+import VerificationIntelligence from '@/components/VerificationIntelligence';
 
-function AnimatedCount({ target, duration = 1500 }) {
-  const [count, setCount] = useState(0);
-  useEffect(() => {
-    if (!target) return;
-    const step = target / (duration / 16);
-    let current = 0;
-    const timer = setInterval(() => {
-      current += step;
-      if (current >= target) { setCount(target); clearInterval(timer); }
-      else setCount(Math.floor(current));
-    }, 16);
-    return () => clearInterval(timer);
-  }, [target, duration]);
-  return <>{count.toLocaleString()}</>;
-}
+import mobileImg from '../../mobile.png';
+import containerImg from '../../container.png';
+import tablet1Img from '../../tablet1.png';
+import tablet2Img from '../../tablet2.png';
 
 export default function Home() {
   const [stats, setStats] = useState(null);
-  const [drug1, setDrug1] = useState('');
-  const [drug2, setDrug2] = useState('');
-  const [interactionResult, setInteractionResult] = useState(null);
-  const [checking, setChecking] = useState(false);
 
   useEffect(() => {
-    fetch('/api/stats').then(r => r.json()).then(setStats).catch(() => {});
+    fetch('/api/stats').then(r => r.json()).then(setStats).catch(() => { });
   }, []);
 
-  // Drug interaction checker (client-side demo database)
-  const INTERACTIONS = {
-    'paracetamol+alcohol': { severity: 'HIGH', msg: '⚠️ Severe liver damage risk. Paracetamol combined with alcohol can cause acute liver failure.' },
-    'aspirin+ibuprofen': { severity: 'MODERATE', msg: '⚠️ Both are NSAIDs. Taking together increases risk of stomach bleeding and ulcers.' },
-    'metformin+alcohol': { severity: 'HIGH', msg: '⚠️ Can cause lactic acidosis — a rare but life-threatening condition.' },
-    'warfarin+aspirin': { severity: 'HIGH', msg: '⚠️ Extremely dangerous. Both thin blood — combined use can cause uncontrolled bleeding.' },
-    'lisinopril+potassium': { severity: 'MODERATE', msg: '⚠️ ACE inhibitors raise potassium. Extra potassium can cause dangerous heart rhythms.' },
-    'simvastatin+grapefruit': { severity: 'MODERATE', msg: '⚠️ Grapefruit increases statin levels in blood, raising risk of muscle damage (rhabdomyolysis).' },
-    'ciprofloxacin+antacid': { severity: 'MODERATE', msg: '⚠️ Antacids reduce Cipro absorption by up to 90%. Take 2 hours apart.' },
-    'ssri+tramadol': { severity: 'HIGH', msg: '⚠️ Risk of Serotonin Syndrome — potentially fatal. Watch for agitation, rapid heartbeat, high temperature.' },
-    'insulin+alcohol': { severity: 'HIGH', msg: '⚠️ Alcohol can cause severe hypoglycemia (dangerously low blood sugar) when taken with insulin.' },
-    'amoxicillin+methotrexate': { severity: 'HIGH', msg: '⚠️ Amoxicillin reduces methotrexate excretion, increasing toxicity risk.' },
-  };
+  // Set up scroll tracking for the entire page
+  const { scrollY } = useScroll();
 
-  const checkInteraction = () => {
-    if (!drug1.trim() || !drug2.trim()) return;
-    setChecking(true);
-    setTimeout(() => {
-      const d1 = drug1.toLowerCase().trim();
-      const d2 = drug2.toLowerCase().trim();
-      const key1 = `${d1}+${d2}`;
-      const key2 = `${d2}+${d1}`;
-      const found = INTERACTIONS[key1] || INTERACTIONS[key2];
-      setInteractionResult(found || { severity: 'SAFE', msg: `✅ No known interaction found between "${drug1}" and "${drug2}". However, always consult your doctor.` });
-      setChecking(false);
-    }, 800);
-  };
+  // Scroll mapping to match the narrative timeline (0 to 600px of scroll)
+  // The phone acts as the anchor stage, moving very slowly
+  const phoneY = useTransform(scrollY, [0, 600], [0, -20]);
+
+  // The container sits inside the phone area, moving slightly faster
+  const containerY = useTransform(scrollY, [0, 600], [0, -40]);
+
+  // Tablets start near container (low/hidden) and rise rapidly through phone and exit
+  // tablet1 emerges towards top-left
+  const tablet1Y = useTransform(scrollY, [0, 600], [40, -180]);
+  const tablet1X = useTransform(scrollY, [0, 600], [10, -30]);
+  const tablet1Rotate = useTransform(scrollY, [0, 600], [0, -15]);
+
+  // tablet2 emerges towards top-right
+  const tablet2Y = useTransform(scrollY, [0, 600], [60, -150]);
+  const tablet2X = useTransform(scrollY, [0, 600], [-10, 40]);
+  const tablet2Rotate = useTransform(scrollY, [0, 600], [0, 20]);
+
+  // Text content lags subtly to feel premium and readable
+  const textY = useTransform(scrollY, [0, 600], [0, -10]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '4rem', paddingBottom: '4rem' }}>
-
-      {/* 🚨 Batch Recall Alert Banner */}
-      <div style={{ background: 'rgba(220,38,38,0.08)', border: '1px solid rgba(220,38,38,0.25)', borderRadius: '12px', padding: '14px 20px', display: 'flex', alignItems: 'center', gap: '12px', animation: 'fadeIn 0.5s ease-in' }}>
-        <div style={{ background: 'rgba(220,38,38,0.15)', borderRadius: '8px', padding: '8px', flexShrink: 0 }}>
-          <Siren size={20} style={{ color: '#DC2626' }} />
-        </div>
-        <div style={{ flex: 1 }}>
-          <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 700, color: '#DC2626' }}>BATCH RECALL ALERT</p>
-          <p style={{ margin: '2px 0 0', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-            Batch <strong>AMX-2024-FAKE</strong> of Amoxicillin 500mg has been recalled by CDSCO. If you have this batch, <Link href="/scan" style={{ color: '#DC2626', fontWeight: 700 }}>scan it now →</Link>
-          </p>
-        </div>
-      </div>
-
-      {/* Hero */}
-      <section style={{ textAlign: 'center', paddingTop: '2rem' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 16px', borderRadius: '99px', background: 'rgba(37,99,235,0.1)', color: '#2563EB', fontSize: '0.85rem', fontWeight: 600, marginBottom: '1.5rem', border: '1px solid rgba(37,99,235,0.2)' }}>
-          <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', animation: 'pulse 2s infinite' }} />
-          Live Counterfeit Detection Platform
-        </div>
-        <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', fontWeight: 900, lineHeight: 1.1, marginBottom: '1.5rem', color: 'var(--text-primary)' }}>
-          Trust No One.<br />
-          <span style={{ color: '#2563EB' }}>Verify Everything.</span>
-        </h1>
-        <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', maxWidth: '600px', margin: '0 auto 2.5rem', lineHeight: 1.7 }}>
-          1 in 10 medicines in India is fake. MediGuard uses a 6-layer AI verification engine and Sarvam AI voice to protect lives.
-        </p>
-        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link href="/scan" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 32px', background: '#2563EB', color: 'white', borderRadius: '10px', fontWeight: 700, fontSize: '1rem', textDecoration: 'none' }}>
-            <ShieldCheck size={20} /> Scan QR Code
-          </Link>
-          <Link href="/demo" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 32px', background: 'var(--bg-surface)', color: 'var(--text-primary)', borderRadius: '10px', fontWeight: 700, fontSize: '1rem', border: '1px solid var(--border-color)', textDecoration: 'none' }}>
-            <Activity size={20} /> Live Demo <ArrowRight size={16} style={{ opacity: 0.5 }} />
-          </Link>
-        </div>
-      </section>
-
-      {/* Live Stats */}
-      <section>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-          {[
-            { label: 'Medicines Verified', value: stats?.totalScans ?? 0, color: '#2563EB', icon: ShieldCheck },
-            { label: 'Counterfeits Caught Today', value: stats?.counterfeitsToday ?? 0, color: '#DC2626', icon: AlertTriangle },
-            { label: 'Total Counterfeits Detected', value: stats?.totalCounterfeits ?? 0, color: '#D97706', icon: TrendingUp },
-            { label: 'Pharmacies Flagged', value: stats?.pharmaciesFlagged ?? 0, color: '#7c3aed', icon: Activity },
-          ].map(({ label, value, color, icon: Icon }) => (
-            <div key={label} style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '12px', padding: '1.5rem', borderTop: `3px solid ${color}` }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>{label}</p>
-                <Icon size={18} style={{ color }} />
-              </div>
-              <p style={{ fontSize: '2.5rem', fontWeight: 900, color, margin: 0, lineHeight: 1 }}>
-                {stats ? <AnimatedCount target={value} /> : '—'}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Features */}
-      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.5rem' }}>
-        {[
-          { icon: Database, color: '#2563EB', bg: 'rgba(37,99,235,0.08)', title: '6-Layer Engine', desc: 'Batch check, cryptographic hash, clone detection, geo-validation, temporal check and supply chain — all run simultaneously.' },
-          { icon: Mic, color: '#7c3aed', bg: 'rgba(124,58,237,0.08)', title: 'Sarvam AI Voice', desc: 'Verification results spoken aloud in Hindi, Tamil, Bengali and 7 more Indian languages. No literacy required.' },
-          { icon: Globe, color: '#059669', bg: 'rgba(5,150,105,0.08)', title: 'Consumer First', desc: 'No app to download. Scan with your browser, hear the result in your language. Works on any phone.' },
-        ].map(({ icon: Icon, color, bg, title, desc }) => (
-          <div key={title} style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '14px', padding: '1.75rem' }}>
-            <div style={{ width: '48px', height: '48px', background: bg, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
-              <Icon size={24} style={{ color }} />
-            </div>
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>{title}</h3>
-            <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6, margin: 0, fontSize: '0.925rem' }}>{desc}</p>
-          </div>
-        ))}
-      </section>
-
-      {/* 💊 Drug Interaction Checker */}
-      <section style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: '16px', padding: '2rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1.5rem' }}>
-          <div style={{ width: '44px', height: '44px', background: 'rgba(124,58,237,0.1)', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Pill size={22} style={{ color: '#7c3aed' }} />
-          </div>
-          <div>
-            <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--text-primary)', margin: 0 }}>Drug Interaction Checker</h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', margin: 0 }}>Check if two medicines are safe to take together</p>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
-          <div style={{ flex: 1, minWidth: '150px' }}>
-            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '6px', textTransform: 'uppercase' }}>Medicine 1</label>
-            <input
-              type="text" placeholder="e.g. Paracetamol"
-              value={drug1} onChange={e => setDrug1(e.target.value)}
-              style={{ width: '100%', padding: '11px 14px', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }}
-            />
-          </div>
-          <div style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--text-muted)', padding: '0 4px 8px' }}>+</div>
-          <div style={{ flex: 1, minWidth: '150px' }}>
-            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '6px', textTransform: 'uppercase' }}>Medicine 2</label>
-            <input
-              type="text" placeholder="e.g. Alcohol"
-              value={drug2} onChange={e => setDrug2(e.target.value)}
-              style={{ width: '100%', padding: '11px 14px', background: 'var(--bg-primary)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '0.95rem', outline: 'none', boxSizing: 'border-box' }}
-            />
-          </div>
-          <button
-            onClick={checkInteraction}
-            disabled={checking || !drug1.trim() || !drug2.trim()}
-            style={{ padding: '11px 24px', borderRadius: '8px', border: 'none', background: '#7c3aed', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', opacity: (!drug1.trim() || !drug2.trim()) ? 0.5 : 1 }}
-          >
-            <Search size={16} /> {checking ? 'Checking...' : 'Check'}
-          </button>
-        </div>
-
-        {interactionResult && (
-          <div style={{
-            marginTop: '1rem', padding: '14px 16px', borderRadius: '10px',
-            background: interactionResult.severity === 'SAFE' ? 'rgba(16,185,129,0.08)' : interactionResult.severity === 'MODERATE' ? 'rgba(245,158,11,0.08)' : 'rgba(220,38,38,0.08)',
-            border: `1px solid ${interactionResult.severity === 'SAFE' ? 'rgba(16,185,129,0.2)' : interactionResult.severity === 'MODERATE' ? 'rgba(245,158,11,0.2)' : 'rgba(220,38,38,0.2)'}`,
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-              <span style={{
-                padding: '2px 8px', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 800,
-                background: interactionResult.severity === 'SAFE' ? '#10b981' : interactionResult.severity === 'MODERATE' ? '#f59e0b' : '#DC2626',
-                color: 'white',
-              }}>{interactionResult.severity} RISK</span>
-            </div>
-            <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-primary)', lineHeight: 1.6 }}>{interactionResult.msg}</p>
-          </div>
-        )}
-
-        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '12px', margin: '12px 0 0' }}>
-          💡 Try: <span onClick={() => { setDrug1('Paracetamol'); setDrug2('Alcohol'); }} style={{ color: '#7c3aed', cursor: 'pointer', fontWeight: 600 }}>Paracetamol + Alcohol</span> · <span onClick={() => { setDrug1('Warfarin'); setDrug2('Aspirin'); }} style={{ color: '#7c3aed', cursor: 'pointer', fontWeight: 600 }}>Warfarin + Aspirin</span> · <span onClick={() => { setDrug1('Aspirin'); setDrug2('Ibuprofen'); }} style={{ color: '#7c3aed', cursor: 'pointer', fontWeight: 600 }}>Aspirin + Ibuprofen</span>
-        </p>
-      </section>
-
-      {/* CTA */}
-      <section style={{ background: 'rgba(37,99,235,0.05)', border: '1px solid rgba(37,99,235,0.15)', borderRadius: '16px', padding: '3rem 2rem', textAlign: 'center' }}>
-        <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
-          Ready to catch a counterfeit?
-        </h2>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '1.05rem' }}>
-          Use one of our demo QR codes to see all 6 verification layers in action.
-        </p>
-        <Link href="/scan" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '14px 36px', background: '#2563EB', color: 'white', borderRadius: '10px', fontWeight: 700, fontSize: '1rem', textDecoration: 'none' }}>
-          Start Scanning → 
-        </Link>
-      </section>
-
+    <div>
       <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.4; }
+        @media (max-width: 768px) {
+          .hide-on-mobile { display: none !important; }
+          .hero-image-col { display: none !important; }
+          .hero-text-col { flex: 1 1 100% !important; text-align: center; }
+          .hero-cta-row { justify-content: center !important; }
         }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(-8px); }
-          to { opacity: 1; transform: translateY(0); }
+        @media (max-width: 480px) {
+          .hero-cta-row { flex-direction: column !important; align-items: stretch !important; }
+          .hero-cta-row a { justify-content: center !important; width: 100%; }
         }
       `}</style>
+
+      <section
+        style={{
+          overflow: 'hidden',
+          position: 'relative',
+          minHeight: '92vh',
+          display: 'flex',
+          alignItems: 'center'
+        }}
+      >
+        <div className="container" style={{ paddingTop: '8rem', paddingBottom: '6rem', width: '100%' }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '4rem',
+            flexWrap: 'wrap'
+          }}>
+
+            {/* Left Side: Image Composition — hidden on mobile */}
+            <motion.div 
+              className="hero-image-col"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1, ease: 'easeOut' }}
+              style={{
+              position: 'relative',
+              flex: '1 1 400px',
+              minHeight: '500px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
+
+              {/* Layer 2: mobile (Anchor Stage) */}
+              <motion.div style={{
+                position: 'absolute',
+                zIndex: 4, // Top most Z position
+                width: '100%',
+                maxWidth: '280px',
+                left: 0, right: 0, margin: '0 auto',
+                y: phoneY
+              }}>
+                <Image src={mobileImg} alt="Mobile Phone" style={{ width: '100%', height: 'auto', objectFit: 'contain' }} priority />
+              </motion.div>
+
+              {/* Layer 3: container (Sits inside phone bounds) */}
+              <motion.div style={{
+                position: 'absolute',
+                zIndex: 3, // Below phone
+                bottom: '-7%',
+                width: '60%',
+                maxWidth: '200px',
+                left: 0, right: 0, margin: '0 auto',
+                y: containerY
+              }}>
+                <Image src={containerImg} alt="Medicine Container" style={{ width: '100%', height: 'auto', objectFit: 'contain' }} />
+              </motion.div>
+
+              {/* Layer 4: tablet1 (Emerges from container) */}
+              <motion.div className="hide-on-mobile" style={{
+                position: 'absolute',
+                zIndex: 1, // Below container
+                bottom: '25%',
+                left: '35%', // Starts horizontally near container
+                width: '35%',
+                maxWidth: '90px',
+                y: tablet1Y,
+                x: tablet1X,
+                rotate: tablet1Rotate
+              }}>
+                <Image src={tablet1Img} alt="Tablet 1" style={{ width: '100%', height: 'auto', objectFit: 'contain' }} />
+              </motion.div>
+
+              {/* Layer 5: tablet2 (Emerges from container) */}
+              <motion.div className="hide-on-mobile" style={{
+                position: 'absolute',
+                zIndex: 2, // Below container
+                bottom: '22%',
+                right: '35%', // Starts horizontally near container
+                width: '30%',
+                maxWidth: '80px',
+                y: tablet2Y,
+                x: tablet2X,
+                rotate: tablet2Rotate
+              }}>
+                <Image src={tablet2Img} alt="Tablet 2" style={{ width: '100%', height: 'auto', objectFit: 'contain' }} />
+              </motion.div>
+
+            </motion.div>
+
+            {/* Layer 6: Text Content */}
+            <motion.div 
+              className="hero-text-col"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
+              style={{
+              flex: '1 1 500px',
+              position: 'relative',
+              zIndex: 5,
+              y: textY
+            }}>
+              <h1 style={{
+                fontSize: 'clamp(3rem, 6.5vw, 4.75rem)',
+                fontWeight: 800,
+                lineHeight: 1.05,
+                marginBottom: '1.5rem',
+                color: '#111827',
+                letterSpacing: '-0.03em',
+                textTransform: 'uppercase'
+              }}>
+                VERIFY MEDICINE<br />
+                AUTHENTICITY <span style={{ fontWeight: 400, fontStyle: 'italic' }}>IN SECONDS</span>
+              </h1>
+              <p style={{
+                fontSize: '1.15rem',
+                color: 'rgba(17, 24, 39, 0.8)',
+                maxWidth: '560px',
+                marginBottom: '3rem',
+                lineHeight: 1.6,
+                fontWeight: 400
+              }}>
+                Multi-layer pharmaceutical verification using cryptographic signatures, supply chain validation, and counterfeit detection.
+              </p>
+              <div className="hero-cta-row" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                <Link
+                  href="/scan"
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                    padding: '16px 32px', background: 'var(--accent-primary)', color: 'var(--accent-primary-text)',
+                    borderRadius: 'var(--radius-md)', fontWeight: 600, fontSize: '1.05rem',
+                    textDecoration: 'none', border: '1px solid #111827',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '4px 4px 0px #111827'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                >
+                  Start Verification
+                </Link>
+                <Link
+                  href="/demo"
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+                    padding: '16px 32px', background: 'var(--accent-secondary)', color: 'var(--accent-secondary-text)',
+                    borderRadius: 'var(--radius-md)', fontWeight: 600, fontSize: '1.05rem',
+                    textDecoration: 'none', border: '1px solid #111827',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '4px 4px 0px #111827'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                >
+                  Watch a demo
+                </Link>
+              </div>
+            </motion.div>
+
+          </div>
+        </div>
+      </section>
+
+      <motion.section 
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-50px" }}
+        variants={{
+          hidden: { opacity: 0 },
+          visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
+        }}
+        className="container" style={{ paddingTop: '2rem', paddingBottom: '3.5rem' }}>
+        <div style={{
+          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '2rem',
+          padding: '1.5rem 0',
+        }}>
+          {[
+            { label: 'Medicines Verified', value: stats ? stats.totalScans : null },
+            { label: 'Counterfeits Caught Today', value: stats ? stats.counterfeitsToday : null },
+            { label: 'Total Counterfeits Detected', value: stats ? stats.totalCounterfeits : null },
+            { label: 'Pharmacies Monitored', value: stats ? stats.pharmaciesFlagged : null },
+          ].map(({ label, value }) => (
+            <motion.div key={label} variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } } }}>
+              <CountUpStat label={label} value={value} />
+            </motion.div>
+          ))}
+        </div>
+      </motion.section>
+
+      <motion.section 
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+      >
+        <div className="container" style={{ paddingTop: '4.5rem', paddingBottom: '5rem' }}>
+          <VerificationWorkflow />
+        </div>
+      </motion.section>
+
+      <motion.section 
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-100px" }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        style={{ paddingTop: '5rem', paddingBottom: '2rem' }}>
+        <VerificationIntelligence />
+      </motion.section>
+
+    </div>
+  );
+}
+
+function CountUpStat({ value, label }) {
+  const [count, setCount] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setIsVisible(true);
+        observer.disconnect();
+      }
+    }, { threshold: 0.1 });
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible || value === null || value === undefined) return;
+    const end = value;
+    const duration = 1500;
+    const startTime = performance.now();
+
+    const animate = (currentTime) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // easeOutExpo
+      const easeOut = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      setCount(Math.floor(easeOut * end));
+
+      if (progress < 1) requestAnimationFrame(animate);
+      else setCount(end);
+    };
+    requestAnimationFrame(animate);
+  }, [isVisible, value]);
+
+  return (
+    <div ref={ref} style={{ textAlign: 'center' }}>
+      <p style={{ fontSize: '3rem', fontWeight: 700, color: 'var(--accent-secondary)', margin: 0, lineHeight: 1.1, letterSpacing: '-0.02em' }}>
+        {value === null || value === undefined ? '\u2014' : count.toLocaleString()}
+      </p>
+      <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', fontWeight: 500, margin: '8px 0 0' }}>{label}</p>
     </div>
   );
 }

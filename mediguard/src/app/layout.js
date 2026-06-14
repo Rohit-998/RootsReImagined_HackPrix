@@ -1,68 +1,44 @@
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
-import ChatBot from "@/components/ChatBot";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import Footer from "@/components/layout/Footer";
 
 export const metadata = {
-  title: "MediGuard | Enterprise Medicine Verification",
-  description: "Pharmaceutical authenticity verification platform focused on counterfeit medicine detection.",
+  title: "MediGuard | Medicine Verification System",
+  description: "Pharmaceutical authenticity verification platform. Verify your medicines in seconds.",
   manifest: "/manifest.json",
+  icons: {
+    icon: '/logo.svg',
+    shortcut: '/logo.svg',
+    apple: '/logo.svg',
+  },
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
     title: "MediGuard",
   },
 };
 
 export const viewport = {
-  themeColor: "#2563EB",
+  themeColor: "#5B46FF",
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
+    <html lang="en">
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#2563EB" />
+        <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+        <meta name="theme-color" content="#5B46FF" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <link rel="apple-touch-icon" href="/icon-512.png" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <link rel="apple-touch-icon" href="/logo.svg" />
       </head>
-      <body suppressHydrationWarning>
+      <body>
         <Navbar />
         <main className="main-content">
           {children}
         </main>
-        <ChatBot />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                if (window.location.hostname === 'localhost') {
-                  navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                    for(let registration of registrations) {
-                      registration.unregister();
-                    }
-                  });
-                } else {
-                  window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/sw.js').catch(() => {});
-                  });
-                }
-              }
-            `,
-          }}
-        />
+        <Footer />
       </body>
     </html>
   );
