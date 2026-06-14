@@ -15,7 +15,7 @@ function ChatBotContent() {
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef(null);
 
- 
+
   const getContext = () => {
     if (pathname !== '/results') return '';
     try {
