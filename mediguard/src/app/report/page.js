@@ -125,12 +125,17 @@ function ReportPageContent() {
       };
 
       recognition.onresult = (event) => {
-        let text = '';
+        let finalText = '';
+        let interimText = '';
         for (let i = 0; i < event.results.length; i++) {
-          text += event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalText += event.results[i][0].transcript;
+          } else {
+            interimText += event.results[i][0].transcript;
+          }
         }
-        fullText = text;
-        setTranscript(text);
+        fullText = finalText + interimText;
+        setTranscript(fullText);
         resetSilenceTimer();
       };
 
